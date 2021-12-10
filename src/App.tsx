@@ -27,7 +27,7 @@ declare let window: any;
 
 
 
-function WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
+function ConnectL1WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   const [account, setAccount] = useState("");
   const [rendered, setRendered] = useState("");
 
@@ -77,6 +77,44 @@ function WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   );
 }
 
+function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
+  const [account, setAccount] = useState("");
+  const [rendered, setRendered] = useState("");
+  const [addrL1, setL1Address] = React.useState("0xadd");
+  const updateL1Address = React.useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setL1Address(evt.target.value);
+    },
+    [setL1Address]
+  );
+
+  useEffect(() => {
+    async function fetchAmount(addrL1) {
+      const currentValue=await account_balance(addrL1)
+      console.log(typeof(currentValue))
+      console.log(typeof(currentValue))
+      setRendered(String(currentValue));
+    }
+    
+    
+    fetchAmount(addrL1);
+  }, );
+
+ return( <div className="row">
+        <input onChange={updateL1Address} value={addrL1} type="text" />
+        <button
+         // onClick={() => ()}
+        >
+         Account balance 
+        </button>
+        {rendered === "" && " dddddddddddddddddddddddddddddddddddddd"}
+      {rendered !== "" && rendered}
+      </div>);
+
+
+  
+}
+
 async function readOnChainData() {
   // Should replace with the end-user wallet, e.g. Metamask
   const defaultProvider = getDefaultProvider();
@@ -88,6 +126,8 @@ async function readOnChainData() {
   console.log({ tokenBalance: myBalance.toString() });
   return( myBalance.toString())
 }
+
+
 async function account_balance(n) {
   
   const provider = new Web3Provider(window.ethereum);
@@ -95,9 +135,10 @@ async function account_balance(n) {
   //console.log( abis.oldl1l2);
   const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
   //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
-   let currentvalue =await oldl1l2.accountBalances(n);
-   console.log(currentvalue._hex);
-
+   let currentReturn =await oldl1l2.accountBalances(n);
+   console.log(typeof(currentReturn._hex));
+   let currentvalue=currentReturn._hex;
+  return({currentvalue})
 }
 
 
@@ -110,7 +151,7 @@ function App() {
   const { transactions } = useTransactions();
   console.log(transactions)
   const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal();
-  const [addrL1, setL1Address] = React.useState("0xaddr");
+  const [addrL1, setL1Address] = React.useState("0xadd");
   const updateL1Address = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
       setL1Address(evt.target.value);
@@ -120,7 +161,29 @@ function App() {
   //console.log(blockNumber)
   return (
     <div className="container">
-        <WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
+
+      <h1>L1 connection</h1>
+      <div className="row">
+        <ConnectL1WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
+      </div>
+      <div className="row">
+        <input onChange={updateL1Address} value={addrL1} type="text" />
+        <button
+          onClick={() => account_balance(addrL1)}
+        >
+         Account balance 
+        </button>
+
+      </div>
+      <ReadL1Balance  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
+      <div className="row">
+      {/*}  <button onClick={() => readOnChainData()}>
+        Read On-Chain Balance
+  </button>*/}
+      <h1>L2 connection</h1>
+        <ConnectedOnly>
+          <IncrementCounter contract={counterContract} />
+        </ConnectedOnly>
       <div className="row">
         The Current Block:{" "}
         {blockNumber && <VoyagerLink.Block block={blockNumber} />}
@@ -130,21 +193,8 @@ function App() {
         {counterContract?.connectedTo && (
           <VoyagerLink.Contract contract={counterContract?.connectedTo} />
         )}
-        <input onChange={updateL1Address} value={addrL1} type="text" />
-        <button
-          onClick={() => account_balance(addrL1)}
-        >
-          Increment
-        </button>
-</div>
-      <div className="row">
-        <button onClick={() => readOnChainData()}>
-        Read On-Chain Balance
+        </div>
 
-        </button>
-        <ConnectedOnly>
-          {/*<IncrementCounter contract={counterContract} />*/}
-        </ConnectedOnly>
       </div>
       <div className="row">
         <p>Transactions:</p>

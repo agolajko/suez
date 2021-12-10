@@ -58,7 +58,7 @@ export function IncrementCounter({ contract}: { contract?: Contract}) {
           onClick={() => incrementCounter && incrementCounter({addr, amount_low, amount_high})}
           disabled={!incrementCounter || submitting}
         >
-          Increment
+         Balance on contract 
         </button>
       </div>
       {transactionStatus && hash && (
