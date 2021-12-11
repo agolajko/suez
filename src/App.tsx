@@ -90,17 +90,19 @@ function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
 
   useEffect(() => {
     async function fetchAmount(addrL1) {
-      const currentValue=await account_balance(addrL1)
-      console.log(typeof(currentValue))
-      console.log(typeof(currentValue))
-      setRendered(String(currentValue));
-    }
+      let currentValue=await account_balance(addrL1);
+      console.log(typeof(currentValue));
+      
+      let stringCurrentValue=(currentValue).toString();
+      console.log((stringCurrentValue));
+      setRendered("   "+stringCurrentValue);
+    };
     
     
     fetchAmount(addrL1);
   }, );
 
- return( <div className="row">
+  return( <div className="row">
         <input onChange={updateL1Address} value={addrL1} type="text" />
         <button
          // onClick={() => ()}
@@ -137,8 +139,8 @@ async function account_balance(n) {
   //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
    let currentReturn =await oldl1l2.accountBalances(n);
    console.log(typeof(currentReturn._hex));
-   let currentvalue=currentReturn._hex;
-  return({currentvalue})
+   let currentvalue=String(currentReturn._hex);
+  return(currentvalue)
 }
 
 
@@ -167,12 +169,7 @@ function App() {
         <ConnectL1WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
       </div>
       <div className="row">
-        <input onChange={updateL1Address} value={addrL1} type="text" />
-        <button
-          onClick={() => account_balance(addrL1)}
-        >
-         Account balance 
-        </button>
+        
 
       </div>
       <ReadL1Balance  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
