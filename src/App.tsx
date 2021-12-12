@@ -16,6 +16,7 @@ import { IncrementCounter } from "./components/IncrementCounter";
 import { VoyagerLink } from "./components/VoyagerLink";
 //import for L1 to work
 import { Contract } from "@ethersproject/contracts";
+//import utils from "@ethersproject/utils";
 import { getDefaultProvider, Web3Provider} from "@ethersproject/providers";
 import React, { useEffect, useState } from "react";
 import { Body, Button, Header, Image, Link } from "./components";
@@ -80,17 +81,17 @@ function ConnectL1WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
 function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   const [account, setAccount] = useState("");
   const [rendered, setRendered] = useState("");
-  const [addrL1, setL1Address] = React.useState("0xadd");
+  const [l1Address, setL1Address] = React.useState("l1Address");
   const updateL1Address = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
       setL1Address(evt.target.value);
     },
     [setL1Address]
   );
-
-  useEffect(() => {
-    async function fetchAmount(addrL1) {
-      let currentValue=await account_balance(addrL1);
+//What we want here, is an input that updates, that is done with updateL1Address and React.Callback. We also need a button, that when pushed, returns the ReadL1BalanceInner. There is no need for useEffect, it seems to me. 
+  
+    async function fetchAmount(l1Address) {
+      let currentValue=await ReadL1BalanceInner(l1Address);
       console.log(typeof(currentValue));
       
       let stringCurrentValue=(currentValue).toString();
@@ -99,17 +100,218 @@ function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
     };
     
     
-    fetchAmount(addrL1);
-  }, );
+    
 
   return( <div className="row">
-        <input onChange={updateL1Address} value={addrL1} type="text" />
+        <input onChange={updateL1Address} value={l1Address} type="text" />
         <button
-         // onClick={() => ()}
+          onClick={() => fetchAmount(l1Address)}
         >
          Account balance 
         </button>
-        {rendered === "" && " dddddddddddddddddddddddddddddddddddddd"}
+        {rendered === "" && " No transactions yet"}
+      {rendered !== "" && rendered}
+      </div>);
+}
+
+async function ReadL1BalanceInner(address) {
+  
+  const provider = new Web3Provider(window.ethereum);
+  const signer= provider.getSigner();
+  //console.log( abis.oldl1l2);
+  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+  //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
+   let currentReturn =await oldl1l2.accountBalances(address);
+   console.log(typeof(currentReturn._hex));
+   let currentvalue=String(currentReturn._hex);
+  return(currentvalue)
+}
+
+
+function DepositL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
+  
+  const [rendered, setRendered] = useState("");
+  
+  const [depositAmount, setDepositAmount] = React.useState("depositAmount");
+  const [l2ContractAddress, setL2ContractAddress] = React.useState("l2ContractAddress");
+  const [l2UserAddress, setL2UserAddress] = React.useState("l2UserAddress");
+  const updateL2UserAddress = React.useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setL2UserAddress(evt.target.value);
+    },
+    [setL2UserAddress]
+  );
+  const updateL2ContractAddress = React.useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setL2ContractAddress(evt.target.value);
+    },
+    [setL2ContractAddress]
+  );
+  const updateDepositAmount = React.useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setDepositAmount(evt.target.value);
+    },
+    [setDepositAmount]
+  );
+  
+    async function sendDeposit(l2ContractAddress, l2UserAddress, depositAmount) {
+      let currentValue=await depositInner(l2ContractAddress, l2UserAddress, depositAmount);
+      //console.log(typeof(currentValue));
+      
+      let stringCurrentValue=(currentValue).toString();
+      //console.log((stringCurrentValue));
+      setRendered("   "+stringCurrentValue);
+    };
+    
+    
+    
+  
+
+  return( <div className="row">
+        <input onChange={updateL2ContractAddress} value={l2ContractAddress} type="text" />
+         <input onChange={updateL2UserAddress} value={l2UserAddress} type="text" />
+          <input onChange={updateDepositAmount} value={depositAmount} type="text" />
+        <button
+          onClick={() => sendDeposit(l2ContractAddress, l2UserAddress, depositAmount)}
+        >
+         Deposit L1 
+        </button>
+        {rendered === "" && "  No transactions yet"}
+      {rendered !== "" && rendered}
+      </div>);  
+}
+
+async function depositInner(l2ContractAddress, l2UserAddress, depositAmount) {
+  
+  const provider = new Web3Provider(window.ethereum);
+  const signer= provider.getSigner();
+  //console.log( abis.oldl1l2);
+  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+  //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
+  let overrides = {
+
+    
+    // The amount to send with the transaction (i.e. msg.value)
+    value: depositAmount,//utils.parseEther(depositAmount),
+  };
+  
+   let currentReturn =await oldl1l2.deposit(l2ContractAddress, l2UserAddress, overrides);//we have to specify amount here, and also above
+   console.log(typeof(currentReturn._hex));
+   let currentvalue=String(currentReturn._hex);
+  return(currentvalue)
+}
+
+
+function WithdrawL2({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
+  const [account, setAccount] = useState("");
+  const [rendered, setRendered] = useState("");
+  
+  const [l2ContractAddress, setL2ContractAddress] = React.useState("l2ContractAddress");
+  const [l2UserAddress, setL2UserAddress] = React.useState("l2UserAddress");
+  const [l1UserAddress, setL1UserAddress] = React.useState("l1UserAddress");
+  const [amount, setAmount] = React.useState("amount");
+  
+  const updateL1UserAddress = React.useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setL1UserAddress(evt.target.value);
+    },
+    [setL1UserAddress]
+  );
+  const updateL2UserAddress = React.useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setL2UserAddress(evt.target.value);
+    },
+    [setL2UserAddress]
+  );
+  const updateL2ContractAddress = React.useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setL2ContractAddress(evt.target.value);
+    },
+    [setL2ContractAddress]
+  );
+  const updateAmount = React.useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setAmount(evt.target.value);
+    },
+    [setAmount]
+  );
+  
+    
+    async function sendWithdrawL2(l2ContractAddress, l2UserAddress, l1UserAddress, amount) {
+      let currentValue=await WithdrawL2Inner(l2ContractAddress, l2UserAddress, l1UserAddress, amount);
+      //console.log(typeof(currentValue));
+      
+      let stringCurrentValue=(currentValue).toString();
+      //console.log((stringCurrentValue));
+      setRendered("   "+stringCurrentValue);
+    };
+    
+    
+    
+  return( <div className="row">
+        <input onChange={updateL2ContractAddress} value={l2ContractAddress} type="text" />
+        <input onChange={updateL2UserAddress} value={l2UserAddress} type="text" />
+        <input onChange={updateL1UserAddress} value={l1UserAddress} type="text" />
+        <input onChange={updateAmount} value={amount} type="text" />
+        <button
+          onClick={() => sendWithdrawL2(l2ContractAddress, l2UserAddress, l1UserAddress, amount)}
+        >
+         Withdraw L2 
+        </button>
+        {rendered === "" && " No transactions yet"}
+      {rendered !== "" && rendered}
+      </div>);
+}
+
+async function WithdrawL2Inner(l2ContractAddress, l2UserAddress, l1UserAddress, amount) {
+  
+  const provider = new Web3Provider(window.ethereum);
+  const signer= provider.getSigner();
+  //console.log( abis.oldl1l2);
+  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+  //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
+  
+  
+   let currentReturn =await oldl1l2.withdrawfroml2(l2ContractAddress, l2UserAddress, l1UserAddress, amount);//we have to specify amount here, and also above
+   console.log(typeof(currentReturn._hex));
+   let currentvalue=String(currentReturn._hex);
+  return(currentvalue)
+}
+
+
+
+function WithdrawL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
+  const [account, setAccount] = useState("");
+  const [rendered, setRendered] = useState("");
+  const [amount, setAmount] = React.useState("Amount");
+  const updateAmount = React.useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setAmount(evt.target.value);
+    },
+    [setAmount]
+  );
+
+  
+    async function sendWithdrawL1(amount) {
+      let currentValue=await WithdrawL1Inner(amount);
+      console.log(typeof(currentValue));
+      
+      let stringCurrentValue=(currentValue).toString();
+      console.log((stringCurrentValue));
+      setRendered("   "+stringCurrentValue);
+    };
+    
+    
+    
+
+  return( <div className="row">
+        <input onChange={updateAmount} value={amount} type="text" />
+        <button
+          onClick={() => sendWithdrawL1(amount)}
+        >
+         Withdraw L1
+        </button>
+        {rendered === "" && " No transaction Yet"}
       {rendered !== "" && rendered}
       </div>);
 
@@ -117,6 +319,22 @@ function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   
 }
 
+async function WithdrawL1Inner(amount) {
+  
+  const provider = new Web3Provider(window.ethereum);
+  const signer= provider.getSigner();
+  //console.log( abis.oldl1l2);
+  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+  //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
+  
+  
+   let currentReturn =await oldl1l2.withdrawfroml1(amount);//we have to specify amount here, and also above
+   console.log(typeof(currentReturn._hex));
+   let currentvalue=String(currentReturn._hex);
+  return(currentvalue)
+}
+
+{/*
 async function readOnChainData() {
   // Should replace with the end-user wallet, e.g. Metamask
   const defaultProvider = getDefaultProvider();
@@ -128,20 +346,10 @@ async function readOnChainData() {
   console.log({ tokenBalance: myBalance.toString() });
   return( myBalance.toString())
 }
+*/}
 
 
-async function account_balance(n) {
-  
-  const provider = new Web3Provider(window.ethereum);
-  const signer= provider.getSigner();
-  //console.log( abis.oldl1l2);
-  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
-  //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
-   let currentReturn =await oldl1l2.accountBalances(n);
-   console.log(typeof(currentReturn._hex));
-   let currentvalue=String(currentReturn._hex);
-  return(currentvalue)
-}
+
 
 
 function App() {
@@ -170,43 +378,57 @@ function App() {
       </div>
       <div className="row">
         
-
-      </div>
       <ReadL1Balance  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
+      </div>
+      
       <div className="row">
-      {/*}  <button onClick={() => readOnChainData()}>
-        Read On-Chain Balance
-  </button>*/}
+      
+      <DepositL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
+      </div>
+      
+      <div className="row">
+      <WithdrawL2  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
+      </div>
+      
+      
+      <div className="row">
+      <WithdrawL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
+      </div>
+      
+     
       <h1>L2 connection</h1>
         <ConnectedOnly>
           <IncrementCounter contract={counterContract} />
         </ConnectedOnly>
+        
       <div className="row">
         The Current Block:{" "}
         {blockNumber && <VoyagerLink.Block block={blockNumber} />}
       </div>
+      
       <div className="row">
         Counter Address:{" "}
         {counterContract?.connectedTo && (
           <VoyagerLink.Contract contract={counterContract?.connectedTo} />
         )}
-        </div>
+      </div>
 
+      <div>
+	      <div className="row">
+		<p>Transactions:</p>
+		<ul>
+		  {transactions.map((tx, idx) => (
+		    <li key={idx}>
+		      <VoyagerLink.Transaction transactionHash={tx.hash} />
+		    </li>
+		  ))}
+		</ul>
+	      </div>
       </div>
-      <div className="row">
-        <p>Transactions:</p>
-        <ul>
-          {transactions.map((tx, idx) => (
-            <li key={idx}>
-              <VoyagerLink.Transaction transactionHash={tx.hash} />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    </div> 
   );
 
-}
+};
 
 function AppWithProviders() {
   return (
@@ -215,7 +437,7 @@ function AppWithProviders() {
         <TransactionsProvider>
           <App />
 
-   </TransactionsProvider>
+        </TransactionsProvider>
       </BlockHashProvider>
     </StarknetProvider>
   );
