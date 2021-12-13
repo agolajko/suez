@@ -80,6 +80,8 @@ function ConnectL1WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   );
 }
 
+
+/////////////////////////////////////////////////////////
 function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   const [account, setAccount] = useState("");
   const [rendered, setRendered] = useState("");
@@ -94,11 +96,11 @@ function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   
     async function fetchAmount(l1Address) {
       let currentValue=await ReadL1BalanceInner(l1Address);
-      console.log(typeof(currentValue));
+      //console.log(typeof(currentValue));
       
       let stringCurrentValue=(currentValue).toString();
-      console.log((stringCurrentValue));
-      setRendered("   "+stringCurrentValue);
+      //console.log((stringCurrentValue));
+      setRendered("   "+parseInt(stringCurrentValue, 16));
     };
     
     
@@ -124,12 +126,12 @@ async function ReadL1BalanceInner(address) {
   const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
   //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
    let currentReturn =await oldl1l2.accountBalances(address);
-   console.log(typeof(currentReturn._hex));
+  // console.log(typeof(currentReturn._hex));
    let currentvalue=String(currentReturn._hex);
   return(currentvalue)
 }
 
-
+/////////////////////////////////////////////////////////////////////
 function DepositL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   
   const [rendered, setRendered] = useState("");
@@ -203,7 +205,7 @@ async function depositInner(l2ContractAddress, l2UserAddress, depositAmount) {
   return(currentvalue)
 }
 
-
+///////////////////////////////////////////////////////////////
 function WithdrawL2({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   const [account, setAccount] = useState("");
   const [rendered, setRendered] = useState("");
@@ -280,7 +282,7 @@ async function WithdrawL2Inner(l2ContractAddress, l2UserAddress, l1UserAddress, 
   return(currentvalue)
 }
 
-
+//////////////////////////////////////////////////////////////
 
 function WithdrawL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   const [account, setAccount] = useState("");
@@ -335,6 +337,9 @@ async function WithdrawL1Inner(amount) {
    let currentvalue=String(currentReturn._hex);
   return(currentvalue)
 }
+
+
+////////////////////////////////////////
 
 {/*
 async function readOnChainData() {

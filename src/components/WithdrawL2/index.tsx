@@ -33,7 +33,7 @@ export function Withdraw_from_L2({ contract}: { contract?: Contract}) {
     },
     [setAmount_high]
   );
-  console.log(setAmount)
+  //console.log(setAmount)
   const updateAddress = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
       setAddress(evt.target.value);
