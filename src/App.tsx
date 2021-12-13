@@ -12,7 +12,9 @@ import {
   useTransactions,
 } from "./providers/TransactionsProvider";
 import { ConnectedOnly } from "./components/ConnectedOnly";
-import { IncrementCounter } from "./components/IncrementCounter";
+import { GetBalance } from "./components/getBalance";
+import { Transfer } from "./components/Transfer";
+import { Withdraw_from_L2 } from "./components/WithdrawL2";
 import { VoyagerLink } from "./components/VoyagerLink";
 //import for L1 to work
 import { Contract } from "@ethersproject/contracts";
@@ -368,6 +370,9 @@ function App() {
     },
     [setL1Address]
   );
+  const ret_value  = useStarknetCall(counterContract, "getBalance", ["2308540148694671285865417627099065456738507260679927862090683974016524797009"]);
+  console.log("ret value")
+  console.log(ret_value) 
   //console.log(blockNumber)
   return (
     <div className="container">
@@ -398,9 +403,10 @@ function App() {
      
       <h1>L2 connection</h1>
         <ConnectedOnly>
-          <IncrementCounter contract={counterContract} />
         </ConnectedOnly>
-        
+        <Transfer contract={counterContract} />
+        <Withdraw_from_L2 contract={counterContract} />
+        <GetBalance contract={counterContract} />
       <div className="row">
         The Current Block:{" "}
         {blockNumber && <VoyagerLink.Block block={blockNumber} />}

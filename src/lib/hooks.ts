@@ -11,7 +11,6 @@ export function useStarknetCall(
 ): Args | undefined {
   const [value, setValue] = React.useState<Args | undefined>(undefined);
   const blockNumber = useBlockHash();
-
   const callContract = React.useCallback(async () => {
     if (contract && method) {
       contract.call(method, args).then((res) => setValue(res));
@@ -21,7 +20,6 @@ export function useStarknetCall(
   React.useEffect(() => {
     callContract();
   }, [callContract, blockNumber]);
-
   return value;
 }
 

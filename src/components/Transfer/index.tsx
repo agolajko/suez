@@ -7,10 +7,10 @@ import { VoyagerLink } from "../VoyagerLink";
 
 import styles from "./index.module.css";  
 
-export function IncrementCounter({ contract}: { contract?: Contract}) {
+export function Transfer({ contract}: { contract?: Contract}) {
   const { account } = useStarknet();
   const {
-    invoke: incrementCounter,
+    invoke: Transfer,
     hash,
     submitting,
   } = useStarknetInvoke(contract, "transfer");
@@ -41,7 +41,7 @@ export function IncrementCounter({ contract}: { contract?: Contract}) {
     [setAddress]
   );
 
-  console.log(contract)
+  //console.log(contract)
   if (!account) return null;
 
   return (
@@ -55,8 +55,8 @@ export function IncrementCounter({ contract}: { contract?: Contract}) {
       <input onChange={updateAmount} value={amount_low} type="text" />
       <input onChange={updateAmount_high} value={amount_high} type="text" />
         <button
-          onClick={() => incrementCounter && incrementCounter({addr, amount_low, amount_high})}
-          disabled={!incrementCounter || submitting}
+          onClick={() => Transfer && Transfer({addr, amount_low, amount_high})}
+          disabled={!Transfer || submitting}
         >
          Transfer 
         </button>

@@ -7,13 +7,13 @@ import { VoyagerLink } from "../VoyagerLink";
 
 import styles from "./index.module.css";  
 
-export function IncrementCounter({ contract}: { contract?: Contract}) {
+export function Withdraw_from_L2({ contract}: { contract?: Contract}) {
   const { account } = useStarknet();
   const {
-    invoke: incrementCounter,
+    invoke: withdraw,
     hash,
     submitting,
-  } = useStarknetInvoke(contract, "transfer");
+  } = useStarknetInvoke(contract, "withdraw");
   const transactionStatus = useTransaction(hash);
 
   const [amount_low, setAmount] = React.useState("0x1");
@@ -41,7 +41,7 @@ export function IncrementCounter({ contract}: { contract?: Contract}) {
     [setAddress]
   );
 
-  console.log(contract)
+  //console.log(contract)
   if (!account) return null;
 
   return (
@@ -55,10 +55,10 @@ export function IncrementCounter({ contract}: { contract?: Contract}) {
       <input onChange={updateAmount} value={amount_low} type="text" />
       <input onChange={updateAmount_high} value={amount_high} type="text" />
         <button
-          onClick={() => incrementCounter && incrementCounter({addr, amount_low, amount_high})}
-          disabled={!incrementCounter || submitting}
+          onClick={() => withdraw && withdraw({addr, amount_low, amount_high})}
+          disabled={!withdraw || submitting}
         >
-         Transfer 
+         Withdraw from L2 
         </button>
       </div>
       {transactionStatus && hash && (
