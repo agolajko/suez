@@ -309,7 +309,7 @@ function WithdrawL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
     
 
   return( <div className="row">
-        <input onChange={updateAmount} value={amount} type="text" />
+        <input onChange={update1Amount} value={amount} type="text" />
         <button
           onClick={() => sendWithdrawL1(amount)}
         >
@@ -389,24 +389,28 @@ function App() {
       </div>  
   
       <div className="row">
+      
         <ConnectL1WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
       </div>
-      <div className="row">
-        
-      <ReadL1Balance  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
-      </div>
+      
       
       <div className="row">
-      
+      Use this to deposit ether directly to L2. Input your L2 account address, and the amount in wei that you want to deposit. 
       <DepositL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
       
       <div className="row">
+      Use this to withdraw from L2, after sending the withdraw message on L2, see below.You need to use the same inputs as before, the L2 account address, that you are withdrawing from, the L1 account that you are withdrawing to, and the amount that you are withdrawing. This is the second step of the withdrawal process. 
       <WithdrawL2  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
       
+      <div className="row">
+      Use this command to view your balance on the L1 contract. This is useful only before Withdrawing from L1.   
+      <ReadL1Balance  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
+      </div>
       
       <div className="row">
+      Use this to withdraw form L1, after you have used the previous WithdrawL2 button. You only need to specify the amount in wei, but need to use the account in metamask that you specified in step 2. This is the third and final step of the withdrawal. 
       <WithdrawL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
       
@@ -421,7 +425,9 @@ function App() {
       </div>
         <ConnectedOnly>
         </ConnectedOnly>
+        Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount that you wish to transfer.
         <Transfer contract={counterContract} />
+        Use this to withdraw from L2. This is a three step process, this is the first step. Specify to which L1 account you wish to transfer (make this precise, as your funds will otherwise be lost), and the amount in wei that you wish to transfer.   
         <Withdraw_from_L2 contract={counterContract} />
         <GetBalance contract={counterContract} />
 
