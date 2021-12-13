@@ -15,6 +15,8 @@ export function GetBalance({ contract}: { contract?: Contract}) {
   let value: any  = useStarknetCall(contract, "getBalance", [account]);
 
   let val_low = value?.balance?.low
+  let val_high = value?.balance?.high
+  let val_total =parseInt(val_low)+2**128 * parseInt(val_high, 16)
   //const value  = useStarknetCall(contract, "getBalance", account);
 
   //const [addr, setAddress] = React.useState("0xadd");
@@ -33,7 +35,7 @@ export function GetBalance({ contract}: { contract?: Contract}) {
     <div className={styles.counter}>
       <div className="row">
 
-        Your balance: {val_low} 
+        Your balance: {val_total} 
         
       </div>
       <div className="row">
