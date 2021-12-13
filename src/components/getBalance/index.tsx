@@ -10,28 +10,30 @@ import styles from "./index.module.css";
 export function GetBalance({ contract}: { contract?: Contract}) {
   const { account } = useStarknet();
    
-  const value = 12;
+  //const value = 12;
+  //let value: any  = useStarknetCall(contract, "getBalance", ["2308540148694671285865417627099065456738507260679927862090683974016524797009"]);
+  let value: any  = useStarknetCall(contract, "getBalance", [account]);
 
-  //const value  = useStarknetCall(contract, "getBalance", "0x051a96612fbc951f5cc2156556c4dfa0cbb374447c9ef79a1db6d7075176c451");
+  let val_low = value?.balance?.low
   //const value  = useStarknetCall(contract, "getBalance", account);
 
-  const [addr, setAddress] = React.useState("0xadd");
+  //const [addr, setAddress] = React.useState("0xadd");
 
-  const updateAddress = React.useCallback(
+  {/*const updateAddress = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
       setAddress(evt.target.value);
     },
     [setAddress]
-  );
+  );*/}
 
-  //console.log(value)
+  //console.log(value?.balance?.low)
   //if (!account) return null;
 
   return (
     <div className={styles.counter}>
       <div className="row">
 
-        Your balance: {value}
+        Your balance: {val_low} 
         
       </div>
       <div className="row">

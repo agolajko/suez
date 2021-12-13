@@ -19,6 +19,11 @@ interface ContractLinkProps {
   contract: string;
 }
 
+function EtherscanLink({ contract }: ContractLinkProps): JSX.Element {
+  const href = `https://goerli.etherscan.io/address/${contract}`;
+  return <Link href={href}>{contract}</Link>;
+}
+
 function ContractLink({ contract }: ContractLinkProps): JSX.Element {
   const href = `https://goerli.voyager.online/contract/${contract}`;
   return <Link href={href}>{contract}</Link>;
@@ -45,6 +50,7 @@ function BlockLink({ block }: BlockLinkProps): JSX.Element {
 }
 
 export const VoyagerLink = {
+  L1Contract: EtherscanLink,
   Contract: ContractLink,
   Transaction: TransactionLink,
   Block: BlockLink,

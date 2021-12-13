@@ -170,11 +170,11 @@ function DepositL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   
 
   return( <div className="row">
-        <input onChange={updateL2ContractAddress} value={l2ContractAddress} type="text" />
+        {/*<input onChange={updateL2ContractAddress} value={l2ContractAddress} type="text" />*/}
          <input onChange={updateL2UserAddress} value={l2UserAddress} type="text" />
           <input onChange={updateDepositAmount} value={depositAmount} type="text" />
         <button
-          onClick={() => sendDeposit(l2ContractAddress, l2UserAddress, depositAmount)}
+          onClick={() => sendDeposit("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, depositAmount)}
         >
          Deposit L1 
         </button>
@@ -251,12 +251,12 @@ function WithdrawL2({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
     
     
   return( <div className="row">
-        <input onChange={updateL2ContractAddress} value={l2ContractAddress} type="text" />
+        {/*<input onChange={updateL2ContractAddress} value={l2ContractAddress} type="text" />*/}
         <input onChange={updateL2UserAddress} value={l2UserAddress} type="text" />
         <input onChange={updateL1UserAddress} value={l1UserAddress} type="text" />
         <input onChange={updateAmount} value={amount} type="text" />
         <button
-          onClick={() => sendWithdrawL2(l2ContractAddress, l2UserAddress, l1UserAddress, amount)}
+          onClick={() => sendWithdrawL2("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount)}
         >
          Withdraw L2 
         </button>
@@ -351,9 +351,6 @@ async function readOnChainData() {
 */}
 
 
-
-
-
 function App() {
   const blockNumber = useBlockHash();
   const counterContract = useCounterContract();
@@ -361,7 +358,6 @@ function App() {
   //const lastCaller = useStarknetCall(counterContract, "lastCaller");
 
   const { transactions } = useTransactions();
-  console.log(transactions)
   const [provider, loadWeb3Modal, logoutOfWeb3Modal] = useWeb3Modal();
   const [addrL1, setL1Address] = React.useState("0xadd");
   const updateL1Address = React.useCallback(
@@ -370,14 +366,23 @@ function App() {
     },
     [setL1Address]
   );
-  const ret_value  = useStarknetCall(counterContract, "getBalance", ["2308540148694671285865417627099065456738507260679927862090683974016524797009"]);
-  console.log("ret value")
-  console.log(ret_value) 
+  //let ret_value : any = useStarknetCall(counterContract, "getBalance", ["2308540148694671285865417627099065456738507260679927862090683974016524797009"]);
+  //console.log("ret value")
+  //const low_bal = ret_value?.balance?.low
+  //console.log(low_bal) 
+  //console.log(ret_value?.balance?.low) 
   //console.log(blockNumber)
   return (
     <div className="container">
 
       <h1>L1 connection</h1>
+
+      <div className="row">
+        Contract Address:{" "}
+          <VoyagerLink.L1Contract contract={"0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997"} />
+        
+      </div>  
+  
       <div className="row">
         <ConnectL1WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
       </div>
@@ -402,22 +407,21 @@ function App() {
       
      
       <h1>L2 connection</h1>
+      
+      <div className="row">
+        Contract Address:{" "}
+        {counterContract?.connectedTo && (
+          <VoyagerLink.Contract contract={counterContract?.connectedTo} />
+        )}
+      </div>
         <ConnectedOnly>
         </ConnectedOnly>
         <Transfer contract={counterContract} />
         <Withdraw_from_L2 contract={counterContract} />
         <GetBalance contract={counterContract} />
-      <div className="row">
-        The Current Block:{" "}
-        {blockNumber && <VoyagerLink.Block block={blockNumber} />}
-      </div>
+
       
-      <div className="row">
-        Counter Address:{" "}
-        {counterContract?.connectedTo && (
-          <VoyagerLink.Contract contract={counterContract?.connectedTo} />
-        )}
-      </div>
+
 
       <div>
 	      <div className="row">

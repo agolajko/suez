@@ -46,10 +46,7 @@ export function Withdraw_from_L2({ contract}: { contract?: Contract}) {
 
   return (
     <div className={styles.counter}>
-      <div className="row">
-        Account:
-        <VoyagerLink.Contract contract={account} />
-      </div>
+
       <div className="row">
       <input onChange={updateAddress} value={addr} type="text" />
       <input onChange={updateAmount} value={amount_low} type="text" />

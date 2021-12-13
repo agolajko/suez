@@ -23,7 +23,6 @@ export function ConnectedOnly({ children }: ConnectedOnlyProps): JSX.Element {
   //if (!account) {
     return (
       <div>
-        <p>Please connect wallet</p>
         <button
           className={styles.connect}
           onClick={() => connectBrowserWallet()}
