@@ -309,7 +309,7 @@ function WithdrawL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
     
 
   return( <div className="row">
-        <input onChange={update1Amount} value={amount} type="text" />
+        <input onChange={updateAmount} value={amount} type="text" />
         <button
           onClick={() => sendWithdrawL1(amount)}
         >
