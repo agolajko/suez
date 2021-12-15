@@ -8,12 +8,16 @@ import { VoyagerLink } from "../VoyagerLink";
 import styles from "./index.module.css";  
 
 export function Transfer({ contract}: { contract?: Contract}) {
+  
   const { account } = useStarknet();
   const {
     invoke: transfer,
     hash,
     submitting,
   } = useStarknetInvoke(contract, "transfer");
+  
+  
+  
   const transactionStatus = useTransaction(hash);
 
   const [amount, setAmount] = React.useState("");
@@ -54,9 +58,9 @@ export function Transfer({ contract}: { contract?: Contract}) {
   );
   */}
 
-  console.log(amount)
-  console.log(amount_low)
-  console.log(amount_high)
+ // console.log(amount)
+  //console.log(amount_low)
+  //console.log(amount_high)
   //const new_high = get_amount_high(amount_high)
   //console.log(new_high)
   
@@ -83,27 +87,37 @@ export function Transfer({ contract}: { contract?: Contract}) {
     return am_high
   }
   
-
+  function transferWithError(params){
+  	try{ if (transfer) transfer(params);
+  	return(1)}
+  	catch  { return(0)}
+  	finally {return (0)}
+  }
   //console.log(contract)
   if (!account) return null;
-
+	
+  try {	
   return (
     <div className={styles.counter}>
       <div className="row">
         Account:
         <VoyagerLink.Contract contract={account} />
         <br></br>
-        {amount_low}
-        <br></br>
-        {amount_high}
+        
+        
+        
       </div>
       <div className="row">
       <input onChange={updateAddress} value={addr} type="text" placeholder="recipient Address"/>
+      &nbsp;
       {/*<input onChange={updateAmount} value={amount_low} type="text" />*/}
       <input onChange={updateAmount} value={amount} type="text" placeholder="amount"/>
+      &nbsp;
+      	
         <button
           onClick={() => transfer && transfer({addr, amount_low, amount_high})}
-          disabled={!transfer || submitting}
+          //Tried transferWithError here, that did not catch the error either. 
+          //disabled={!transfer || submitting}
         >
          Transfer 
         </button>
@@ -119,4 +133,7 @@ export function Transfer({ contract}: { contract?: Contract}) {
       )}
     </div>
   );
+  } catch (err) {console.error(err);
+  return(<div>hello</div>);}
+  //finally {(<div>bello</div>)}
 }

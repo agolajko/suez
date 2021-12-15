@@ -16,23 +16,22 @@ export function Withdraw_from_L2({ contract}: { contract?: Contract}) {
   } = useStarknetInvoke(contract, "withdraw");
   const transactionStatus = useTransaction(hash);
 
-  const [amount_low, setAmount] = React.useState("0x1");
-  const [amount_high, setAmount_high] = React.useState("0x1");
-  const [addr, setAddress] = React.useState("0xadd");
+  const [amount, setAmount] = React.useState("");
+  const [amount_low, setAmount_low] = React.useState("");
+  const [amount_high, setAmount_high] = React.useState("");
+  const [addr, setAddress] = React.useState("");
 
   const updateAmount = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
+      
       setAmount(evt.target.value);
+      setAmount_low(get_amount_low(evt.target.value));
+      setAmount_high(get_amount_high(evt.target.value));
     },
     [setAmount]
   );  
   
-  const updateAmount_high = React.useCallback(
-    (evt: React.ChangeEvent<HTMLInputElement>) => {
-      setAmount_high(evt.target.value);
-    },
-    [setAmount_high]
-  );
+  
   //console.log(setAmount)
   const updateAddress = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,6 +40,25 @@ export function Withdraw_from_L2({ contract}: { contract?: Contract}) {
     [setAddress]
   );
 
+	
+  function get_amount_low(one_num){
+    if (one_num == "") {return String(0)}
+    let new_int = BigInt(one_num);
+    let am_low = new_int % BigInt((2**128));
+    return String(am_low)
+  }
+
+  function get_amount_high(one_num){
+    if (one_num == "") {return String(0)}
+    const new_int = BigInt(one_num);
+    console.log(new_int)
+    const am_high = String(new_int / BigInt(2**128));
+    return am_high
+  }
+
+	console.log(amount);
+	console.log(amount_low);
+	console.log(amount_high);
   //console.log(contract)
   if (!account) return null;
 
@@ -48,12 +66,14 @@ export function Withdraw_from_L2({ contract}: { contract?: Contract}) {
     <div className={styles.counter}>
 
       <div className="row">
-      <input onChange={updateAddress} value={addr} type="text" />
-      <input onChange={updateAmount} value={amount_low} type="text" />
-      <input onChange={updateAmount_high} value={amount_high} type="text" />
+      <input onChange={updateAddress} value={addr} type="text" placeholder="l1 address"/>
+      &nbsp;
+      <input onChange={updateAmount} value={amount} type="text" placeholder="amount"/>
+      &nbsp;
+      
         <button
           onClick={() => withdraw && withdraw({addr, amount_low, amount_high})}
-          disabled={!withdraw || submitting}
+          //disabled={!withdraw || submitting}
         >
          Withdraw from L2 
         </button>

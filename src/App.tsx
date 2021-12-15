@@ -362,7 +362,7 @@ async function readOnChainData() {
 */}
 
 
-function App() {
+function App() { 
   const blockNumber = useBlockHash();
   const counterContract = useCounterContract();
   //const counter = useStarknetCall(counterContract, "counter");
@@ -431,8 +431,10 @@ function App() {
       </div>
         <ConnectedOnly>
         </ConnectedOnly>
+        
         <div className="row" title="Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount that you wish to transfer.">
         <Transfer contract={counterContract} />
+        
         </div >
         
         <div className="row" title="Use this to withdraw from L2. This is a three step process, this is the first step. Specify to which L1 account you wish to transfer (make this precise, as your funds will otherwise be lost), and the amount in wei that you wish to transfer.">
