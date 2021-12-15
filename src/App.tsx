@@ -85,7 +85,7 @@ function ConnectL1WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
 function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   const [account, setAccount] = useState("");
   const [rendered, setRendered] = useState("");
-  const [l1Address, setL1Address] = React.useState("l1Address");
+  const [l1Address, setL1Address] = React.useState("");
   const updateL1Address = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
       setL1Address(evt.target.value);
@@ -107,7 +107,7 @@ function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
     
 
   return( <div className="row">
-        <input onChange={updateL1Address} value={l1Address} type="text" />
+        <input onChange={updateL1Address} value={l1Address} type="text" placeholder="l1 User Address"/>&nbsp;
         <button
           onClick={() => fetchAmount(l1Address)}
         >
@@ -136,9 +136,9 @@ function DepositL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   
   const [rendered, setRendered] = useState("");
   
-  const [depositAmount, setDepositAmount] = React.useState("depositAmount");
+  const [depositAmount, setDepositAmount] = React.useState("");
   const [l2ContractAddress, setL2ContractAddress] = React.useState("l2ContractAddress");
-  const [l2UserAddress, setL2UserAddress] = React.useState("l2UserAddress");
+  const [l2UserAddress, setL2UserAddress] = React.useState("");
   const updateL2UserAddress = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
       setL2UserAddress(evt.target.value);
@@ -173,8 +173,10 @@ function DepositL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
 
   return( <div className="row">
         {/*<input onChange={updateL2ContractAddress} value={l2ContractAddress} type="text" />*/}
-         <input onChange={updateL2UserAddress} value={l2UserAddress} type="text" />
-          <input onChange={updateDepositAmount} value={depositAmount} type="text" />
+         <input onChange={updateL2UserAddress} value={l2UserAddress} type="text" placeholder="l2 User address"/>
+         &nbsp;
+          <input onChange={updateDepositAmount} value={depositAmount} type="text" placeholder="amount"/>
+          &nbsp;
         <button
           onClick={() => sendDeposit("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, depositAmount)}
         >
@@ -211,9 +213,9 @@ function WithdrawL2({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   const [rendered, setRendered] = useState("");
   
   const [l2ContractAddress, setL2ContractAddress] = React.useState("l2ContractAddress");
-  const [l2UserAddress, setL2UserAddress] = React.useState("l2UserAddress");
-  const [l1UserAddress, setL1UserAddress] = React.useState("l1UserAddress");
-  const [amount, setAmount] = React.useState("amount");
+  const [l2UserAddress, setL2UserAddress] = React.useState("");
+  const [l1UserAddress, setL1UserAddress] = React.useState("");
+  const [amount, setAmount] = React.useState("");
   
   const updateL1UserAddress = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,9 +256,12 @@ function WithdrawL2({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
     
   return( <div className="row">
         {/*<input onChange={updateL2ContractAddress} value={l2ContractAddress} type="text" />*/}
-        <input onChange={updateL2UserAddress} value={l2UserAddress} type="text" />
-        <input onChange={updateL1UserAddress} value={l1UserAddress} type="text" />
-        <input onChange={updateAmount} value={amount} type="text" />
+        <input onChange={updateL2UserAddress} value={l2UserAddress} type="text" placeholder="l2 User address" />
+        &nbsp;
+        <input onChange={updateL1UserAddress} value={l1UserAddress} type="text" placeholder="l1 User address"/>
+        &nbsp;
+        <input onChange={updateAmount} value={amount} type="text" placeholder="amount"/>
+        &nbsp;
         <button
           onClick={() => sendWithdrawL2("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount)}
         >
@@ -287,7 +292,7 @@ async function WithdrawL2Inner(l2ContractAddress, l2UserAddress, l1UserAddress, 
 function WithdrawL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
   const [account, setAccount] = useState("");
   const [rendered, setRendered] = useState("");
-  const [amount, setAmount] = React.useState("Amount");
+  const [amount, setAmount] = React.useState("");
   const updateAmount = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
       setAmount(evt.target.value);
@@ -309,7 +314,8 @@ function WithdrawL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
     
 
   return( <div className="row">
-        <input onChange={updateAmount} value={amount} type="text" />
+        <input onChange={updateAmount} value={amount} type="text" placeholder="amount3"/>
+        &nbsp;  
         <button
           onClick={() => sendWithdrawL1(amount)}
         >
@@ -394,23 +400,23 @@ function App() {
       </div>
       
       
-      <div className="row">
-      Use this to deposit ether directly to L2. Input your L2 account address, and the amount in wei that you want to deposit. 
+      <div className="row" title="Use this to deposit ether directly to L2. Input your L2 account address, and the amount in wei that you want to deposit.">
+       
       <DepositL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
       
-      <div className="row">
-      Use this to withdraw from L2, after sending the withdraw message on L2, see below.You need to use the same inputs as before, the L2 account address, that you are withdrawing from, the L1 account that you are withdrawing to, and the amount that you are withdrawing. This is the second step of the withdrawal process. 
+      <div className="row" title="Use this to withdraw from L2, after sending the withdraw message on L2, see below.You need to use the same inputs as before, the L2 account address, that you are withdrawing from, the L1 account that you are withdrawing to, and the amount that you are withdrawing. This is the second step of the withdrawal process. ">
+      
       <WithdrawL2  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
       
-      <div className="row">
-      Use this command to view your balance on the L1 contract. This is useful only before Withdrawing from L1.   
+      <div className="row" title="Use this command to view your balance on the L1 contract. This is useful only before Withdrawing from L1.">
+         
       <ReadL1Balance  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
       
-      <div className="row">
-      Use this to withdraw form L1, after you have used the previous WithdrawL2 button. You only need to specify the amount in wei, but need to use the account in metamask that you specified in step 2. This is the third and final step of the withdrawal. 
+      <div className="row" title="Use this to withdraw form L1, after you have used the previous WithdrawL2 button. You only need to specify the amount in wei, but need to use the account in metamask that you specified in step 2. This is the third and final step of the withdrawal.">
+       
       <WithdrawL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
       
@@ -425,12 +431,18 @@ function App() {
       </div>
         <ConnectedOnly>
         </ConnectedOnly>
-        Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount that you wish to transfer.
+        <div className="row" title="Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount that you wish to transfer.">
         <Transfer contract={counterContract} />
-        Use this to withdraw from L2. This is a three step process, this is the first step. Specify to which L1 account you wish to transfer (make this precise, as your funds will otherwise be lost), and the amount in wei that you wish to transfer.   
+        </div >
+        
+        <div className="row" title="Use this to withdraw from L2. This is a three step process, this is the first step. Specify to which L1 account you wish to transfer (make this precise, as your funds will otherwise be lost), and the amount in wei that you wish to transfer.">
+           
         <Withdraw_from_L2 contract={counterContract} />
+        </div>
+        
+        <div className="row" title="Your L2 balance">
         <GetBalance contract={counterContract} />
-
+	</div>
       
 
 

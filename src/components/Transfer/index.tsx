@@ -16,10 +16,10 @@ export function Transfer({ contract}: { contract?: Contract}) {
   } = useStarknetInvoke(contract, "transfer");
   const transactionStatus = useTransaction(hash);
 
-  const [amount, setAmount] = React.useState("0");
-  const [amount_low, setAmount_low] = React.useState("0x1");
-  const [amount_high, setAmount_high] = React.useState("0");
-  const [addr, setAddress] = React.useState("0xadd");
+  const [amount, setAmount] = React.useState("");
+  const [amount_low, setAmount_low] = React.useState("");
+  const [amount_high, setAmount_high] = React.useState("");
+  const [addr, setAddress] = React.useState("");
 
   const updateAmount = React.useCallback(
     (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,9 +98,9 @@ export function Transfer({ contract}: { contract?: Contract}) {
         {amount_high}
       </div>
       <div className="row">
-      <input onChange={updateAddress} value={addr} type="text" />
+      <input onChange={updateAddress} value={addr} type="text" placeholder="recipient Address"/>
       {/*<input onChange={updateAmount} value={amount_low} type="text" />*/}
-      <input onChange={updateAmount} value={amount} type="text" />
+      <input onChange={updateAmount} value={amount} type="text" placeholder="amount"/>
         <button
           onClick={() => transfer && transfer({addr, amount_low, amount_high})}
           disabled={!transfer || submitting}
