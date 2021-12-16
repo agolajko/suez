@@ -48,6 +48,21 @@ button {
     border: 2px solid var(--color-link);
 }
 
+ol.starknetexplain {
+    color: gray;
+}
+
+p.starknetexplain {
+    color: gray;
+}
+
+p.grey {
+    color: gray;
+}
+
+div.rowgrey {
+    color: gray;
+}
 
 
 /* /////////////////////////////////////////////////  

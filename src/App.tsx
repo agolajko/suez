@@ -188,7 +188,7 @@ function DepositL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
         >
          Deposit L1 
         </button>
-        {rendered === "" && "  No transactions yet"}
+        {rendered === "" && ""}
       {rendered !== "" && rendered}
       </div>);  
 }
@@ -259,7 +259,7 @@ function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
     async function sendWithdrawL2(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
       function get_amount_low(one_num){
 	      if (one_num == "") {return String(0)}
-	      let new_int = BigInt(Math.floor(10**18*parseFloat(one_num)));
+	      let new_int = BigInt(Math.floor(10**9*parseFloat(one_num)))*BigInt(10**9);
 	      let am_low = new_int % BigInt((2**128));
 	      return String(am_low)
   }
@@ -351,13 +351,13 @@ function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
         >
         1
         </button>
-        &nbsp; wait 5 mins
+        &nbsp; wait 5 mins &nbsp;
         <button
           onClick={() => sendWithdrawL2toL1("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
         >
         2
         </button>
-        &nbsp; wait 5 mins
+        &nbsp; wait 5 mins &nbsp;
         <button
           onClick={() => sendWithdrawL1("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
         >
@@ -501,14 +501,11 @@ function App() {
 
       <ConnectedOnly>
       </ConnectedOnly>      
-      <h1>Deposit to Starknet</h1>
 
-      <div className="row">
-        Contract Address:{" "}
-          <VoyagerLink.L1Contract contract={"0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997"} />
-        
-      </div>  
-  
+
+     <h1>Deposit to Starknet</h1>
+
+
 
       
       
@@ -523,18 +520,12 @@ function App() {
       
      
       <h1>Withdraw from Starknet</h1>
-      
-      <div className="row">
-        Contract Address:{" "}
-        {counterContract?.connectedTo && (
-          <VoyagerLink.Contract contract={counterContract?.connectedTo} />
-        )}
-      </div>
-      
-      
-      
-      
-
+     <p className = "starknetexplain"> Withdrawal from Starknet back to your Ethereum wallet consists of 3 steps:</p>
+     <ol className="starknetexplain">
+        <li> Sending the transaction the the bridge </li>
+        <li> Cross the bridge (consume transaction) </li>
+        <li> Send the money to your Ethereum wallet from the bridge </li>
+     </ol>
         
         <div className="row" >
        
@@ -545,10 +536,10 @@ function App() {
 
         <div className="row" title="Your L2 balance">
         <GetBalance contract={counterContract} />
-	      </div>
         
         {/*<div className="row" title="Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount in eth that you wish to transfer.">*/}
         <Transfer contract={counterContract} />
+	      </div>
         
         
         
@@ -565,7 +556,22 @@ function App() {
 		</ul>
 	      </div>
       </div>
-    </div> 
+
+      <div className="rowgrey">
+        {/*<p className="grey">Contract Address:{" "}</p>*/}
+        Starknet Cairo Contract Address:{" "}
+        {counterContract?.connectedTo && (
+          <VoyagerLink.Contract contract={counterContract?.connectedTo} />
+        )}
+      </div>   
+      <div className="rowgrey">
+        {/*<p className="grey">Contract Address:{" "}</p>*/}
+        Ethereum Solidity Contract Address:{" "}
+          <VoyagerLink.L1Contract contract={"0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997"} />
+        
+      </div>  
+   
+  </div> 
   );
 
 };

@@ -32,7 +32,7 @@ export function GetBalance({ contract}: { contract?: Contract}) {
   //if (!account) return null;
 
   return (
-    <div className={styles.counter}>
+    <div >
 
         Your Starknet balance: {val_total/10**18} eth
         
