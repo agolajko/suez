@@ -94,15 +94,13 @@ export function Transfer({ contract}: { contract?: Contract}) {
   	finally {return (0)}
   }
   //console.log(contract)
-  if (!account) return null;
+  //if (!account) return null;
 	
   try {	
   return (
     <div className={styles.counter}>
       <div className="row">
-        Account:
-        <VoyagerLink.Contract contract={account} />
-        <br></br>
+       
         
         
         

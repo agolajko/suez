@@ -11,6 +11,12 @@ import {
   TransactionsProvider,
   useTransactions,
 } from "./providers/TransactionsProvider";
+
+import { useStarknetInvoke } from "./lib/hooks";
+import { useStarknet } from "./providers/StarknetProvider";
+import { useTransaction } from "./providers/TransactionsProvider";
+import { Contract as StarkwareContract} from "starknet";
+
 import { ConnectedOnly } from "./components/ConnectedOnly";
 import { GetBalance } from "./components/getBalance";
 import { Transfer } from "./components/Transfer";
@@ -208,8 +214,15 @@ async function depositInner(l2ContractAddress, l2UserAddress, depositAmount) {
 }
 
 ///////////////////////////////////////////////////////////////
-function WithdrawL2({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
-  const [account, setAccount] = useState("");
+function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
+  
+  const { account } = useStarknet();
+  const {
+    invoke: withdraw,
+    hash,
+    submitting,
+  } = useStarknetInvoke(contract, "withdraw");
+  
   const [rendered, setRendered] = useState("");
   
   const [l2ContractAddress, setL2ContractAddress] = React.useState("l2ContractAddress");
@@ -242,17 +255,88 @@ function WithdrawL2({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
     [setAmount]
   );
   
-    
-    async function sendWithdrawL2(l2ContractAddress, l2UserAddress, l1UserAddress, amount) {
-      let currentValue=await WithdrawL2Inner(l2ContractAddress, l2UserAddress, l1UserAddress, amount);
-      //console.log(typeof(currentValue));
-      
-      let stringCurrentValue=(currentValue).toString();
-      //console.log((stringCurrentValue));
-      setRendered("   "+stringCurrentValue);
+    ///////////////////////////////
+    async function sendWithdrawL2(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
+      function get_amount_low(one_num){
+	      if (one_num == "") {return String(0)}
+	      let new_int = BigInt(Math.floor(10**18*parseFloat(one_num)));
+	      let am_low = new_int % BigInt((2**128));
+	      return String(am_low)
+  }
+
+      function get_amount_high(one_num){
+	    if (one_num == "") {return String(0)}
+	    const new_int = BigInt(Math.floor(10**18*parseFloat(one_num)));
+	    const am_high = String(new_int / BigInt(2**128));
+	    return am_high
+  }
+  
+     let amount_low=get_amount_low(amount);
+     let amount_high=get_amount_high(amount);
+     if (withdraw) {withdraw({l1UserAddress, amount_low, amount_high})}
     };
     
+    async function sendWithdrawL2toL1(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
+      const provider = new Web3Provider(window.ethereum);
+      const signer= provider.getSigner();
+  //console.log( abis.oldl1l2);
+      const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+      
+      let currentReturn =await oldl1l2.withdrawfroml2(l2ContractAddress, l2UserAddress, l1UserAddress, String(BigInt(Math.floor(10**18*parseFloat(amount)))));
+    };
     
+    async function sendWithdrawL1(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
+      const provider = new Web3Provider(window.ethereum);
+      const signer= provider.getSigner();
+  //console.log( abis.oldl1l2);
+      const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+      let currentReturn =await oldl1l2.withdrawfroml1(String(BigInt(Math.floor(10**18*parseFloat(amount)))));
+    }; 
+    /////////////////////////////////////////////
+    async function WithdrawL2Inner(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
+  
+  const provider = new Web3Provider(window.ethereum);
+  const signer= provider.getSigner();
+  //console.log( abis.oldl1l2);
+  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+  //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
+  ////////////////////////////////////////////
+  //Starknet L2 Withdraw
+  //const counterContract = useCounterContract();
+  
+  
+  //console.log("hello")
+  
+  //const transactionStatus = useTransaction(hash);
+  
+  function get_amount_low(one_num){
+    if (one_num == "") {return String(0)}
+    let new_int = BigInt(Math.floor(10**18*parseFloat(one_num)));
+    let am_low = new_int % BigInt((2**128));
+    return String(am_low)
+  }
+
+  function get_amount_high(one_num){
+    if (one_num == "") {return String(0)}
+    const new_int = BigInt(Math.floor(10**18*parseFloat(one_num)));
+    const am_high = String(new_int / BigInt(2**128));
+    return am_high
+  }
+  
+  let amount_low=get_amount_low(amount);
+  let amount_high=get_amount_high(amount);
+  if (withdraw) {withdraw({l1UserAddress, amount_low, amount_high})}
+  /////////////////////////////////////////////////////////////
+  //Consume message widthraw
+  let currentReturn =await oldl1l2.withdrawfroml2(l2ContractAddress, l2UserAddress, l1UserAddress, String(BigInt(Math.floor(10**18*parseFloat(amount)))));//we have to specify amount here, and also above
+  ////////////////////////////////////////////////////////////
+   //withdraw to l1
+  let currentReturn2 =await oldl1l2.withdrawfroml1(String(BigInt(Math.floor(10**18*parseFloat(amount)))));//we have to specify amount here, and also above
+   
+  // console.log(typeof(currentReturn._hex));
+   let currentvalue=String(currentReturn._hex);
+  return(currentReturn)
+}
     
   return( <div className="row">
         {/*<input onChange={updateL2ContractAddress} value={l2ContractAddress} type="text" />*/}
@@ -261,31 +345,30 @@ function WithdrawL2({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
         <input onChange={updateL1UserAddress} value={l1UserAddress} type="text" placeholder="l1 User address"/>
         &nbsp;
         <input onChange={updateAmount} value={amount} type="text" placeholder="amount"/>
-        &nbsp;
+        <br></br>
         <button
-          onClick={() => sendWithdrawL2("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount)}
+          onClick={() => sendWithdrawL2("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
         >
-         Withdraw L2 
+        1
         </button>
-        {rendered === "" && " No transactions yet"}
+        &nbsp; wait 5 mins
+        <button
+          onClick={() => sendWithdrawL2toL1("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
+        >
+        2
+        </button>
+        &nbsp; wait 5 mins
+        <button
+          onClick={() => sendWithdrawL1("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
+        >
+         3 
+        </button>
+        {rendered === "" && " "}
       {rendered !== "" && rendered}
       </div>);
 }
 
-async function WithdrawL2Inner(l2ContractAddress, l2UserAddress, l1UserAddress, amount) {
-  
-  const provider = new Web3Provider(window.ethereum);
-  const signer= provider.getSigner();
-  //console.log( abis.oldl1l2);
-  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
-  //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
-  
-  
-   let currentReturn =await oldl1l2.withdrawfroml2(l2ContractAddress, l2UserAddress, l1UserAddress, String(BigInt(Math.floor(10**18*parseFloat(amount)))));//we have to specify amount here, and also above
-   console.log(typeof(currentReturn._hex));
-   let currentvalue=String(currentReturn._hex);
-  return(currentvalue)
-}
+
 
 //////////////////////////////////////////////////////////////
 
@@ -338,8 +421,10 @@ async function WithdrawL1Inner(amount) {
   //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
   
   //console.log(typeof(amount));
+  
+   
    let currentReturn =await oldl1l2.withdrawfroml1(String(BigInt(Math.floor(10**18*parseFloat(amount)))));//we have to specify amount here, and also above
-   console.log(typeof(currentReturn._hex));
+   //console.log(typeof(currentReturn._hex));
    let currentvalue=String(currentReturn._hex);
   return(currentvalue)
 }
@@ -361,6 +446,29 @@ async function readOnChainData() {
 }
 */}
 
+
+{/*
+<div className="row" title="Use this to withdraw from L2, after sending the withdraw message on L2, see below.You need to use the same inputs as before, the L2 account address, that you are withdrawing from, the L1 account that you are withdrawing to, and the amount that you are withdrawing. This is the second step of the withdrawal process. ">
+      
+      <WithdrawL2  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
+      </div>
+      
+      <div className="row" title="Use this command to view your balance on the L1 contract. This is useful only before Withdrawing from L1.">
+         
+      <ReadL1Balance  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
+      </div>
+      
+      
+      
+      
+      <div className="row" title="Use this to withdraw from L2. This is a three step process, this is the first step. Specify to which L1 account you wish to transfer (make this precise, as your funds will otherwise be lost), and the amount in eth that you wish to transfer.">
+           
+        <Withdraw_from_L2 contract={counterContract} />
+        </div>
+        
+        
+        title="Use this to withdraw form L1, after you have used the previous WithdrawL2 button. You only need to specify the amount in eth, but need to use the account in metamask that you specified in step 2. This is the third and final step of the withdrawal."
+*/}
 
 function App() { 
   const blockNumber = useBlockHash();
@@ -405,20 +513,9 @@ function App() {
       <DepositL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
       
-      <div className="row" title="Use this to withdraw from L2, after sending the withdraw message on L2, see below.You need to use the same inputs as before, the L2 account address, that you are withdrawing from, the L1 account that you are withdrawing to, and the amount that you are withdrawing. This is the second step of the withdrawal process. ">
       
-      <WithdrawL2  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
-      </div>
       
-      <div className="row" title="Use this command to view your balance on the L1 contract. This is useful only before Withdrawing from L1.">
-         
-      <ReadL1Balance  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
-      </div>
       
-      <div className="row" title="Use this to withdraw form L1, after you have used the previous WithdrawL2 button. You only need to specify the amount in eth, but need to use the account in metamask that you specified in step 2. This is the third and final step of the withdrawal.">
-       
-      <WithdrawL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
-      </div>
       
      
       <h1>L2 connection</h1>
@@ -429,18 +526,25 @@ function App() {
           <VoyagerLink.Contract contract={counterContract?.connectedTo} />
         )}
       </div>
+      
+      
+      
+      
         <ConnectedOnly>
         </ConnectedOnly>
+        
+        <div className="row" >
+       
+      <WithdrawL2  contract={counterContract}/>
+      </div>
         
         <div className="row" title="Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount in eth that you wish to transfer.">
         <Transfer contract={counterContract} />
         
         </div >
         
-        <div className="row" title="Use this to withdraw from L2. This is a three step process, this is the first step. Specify to which L1 account you wish to transfer (make this precise, as your funds will otherwise be lost), and the amount in eth that you wish to transfer.">
-           
-        <Withdraw_from_L2 contract={counterContract} />
-        </div>
+        
+        
         
         <div className="row" title="Your L2 balance">
         <GetBalance contract={counterContract} />
