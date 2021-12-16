@@ -55,9 +55,9 @@ export function Withdraw_from_L2({ contract}: { contract?: Contract}) {
     return am_high
   }
 
-	console.log(amount);
-	console.log(amount_low);
-	console.log(amount_high);
+	//console.log(amount);
+	//console.log(amount_low);
+	//console.log(amount_high);
   //console.log(contract)
   if (!account) return null;
 

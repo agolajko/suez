@@ -97,10 +97,10 @@ function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
     async function fetchAmount(l1Address) {
       let currentValue=await ReadL1BalanceInner(l1Address);
       //console.log(typeof(currentValue));
-      
-      let stringCurrentValue=(parseFloat(currentValue)/10**18).toString();
-      //console.log((stringCurrentValue));
-      setRendered("   "+parseInt(stringCurrentValue, 16));
+      //console.log(currentValue);
+      let stringCurrentValue=((currentValue)).toString();
+      //console.log(parseInt(stringCurrentValue)/10**18);
+      setRendered("   "+parseInt(stringCurrentValue, 16)/10**18+"  eth");
     };
     
     
