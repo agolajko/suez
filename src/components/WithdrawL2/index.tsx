@@ -43,15 +43,14 @@ export function Withdraw_from_L2({ contract}: { contract?: Contract}) {
 	
   function get_amount_low(one_num){
     if (one_num == "") {return String(0)}
-    let new_int = BigInt(one_num);
+    let new_int = BigInt(Math.floor(10**18*parseFloat(one_num)));
     let am_low = new_int % BigInt((2**128));
     return String(am_low)
   }
 
   function get_amount_high(one_num){
     if (one_num == "") {return String(0)}
-    const new_int = BigInt(one_num);
-    console.log(new_int)
+    const new_int = BigInt(Math.floor(10**18*parseFloat(one_num)));
     const am_high = String(new_int / BigInt(2**128));
     return am_high
   }

@@ -98,7 +98,7 @@ function ReadL1Balance({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
       let currentValue=await ReadL1BalanceInner(l1Address);
       //console.log(typeof(currentValue));
       
-      let stringCurrentValue=(currentValue).toString();
+      let stringCurrentValue=(parseFloat(currentValue)/10**18).toString();
       //console.log((stringCurrentValue));
       setRendered("   "+parseInt(stringCurrentValue, 16));
     };
@@ -198,7 +198,7 @@ async function depositInner(l2ContractAddress, l2UserAddress, depositAmount) {
 
     
     // The amount to send with the transaction (i.e. msg.value)
-    value: depositAmount,//utils.parseEther(depositAmount),
+    value: String(BigInt(Math.floor(10**18*parseFloat(depositAmount)))),//utils.parseEther(depositAmount),
   };
   
    let currentReturn =await oldl1l2.deposit(l2ContractAddress, l2UserAddress, overrides);//we have to specify amount here, and also above
@@ -281,7 +281,7 @@ async function WithdrawL2Inner(l2ContractAddress, l2UserAddress, l1UserAddress, 
   //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
   
   
-   let currentReturn =await oldl1l2.withdrawfroml2(l2ContractAddress, l2UserAddress, l1UserAddress, amount);//we have to specify amount here, and also above
+   let currentReturn =await oldl1l2.withdrawfroml2(l2ContractAddress, l2UserAddress, l1UserAddress, String(BigInt(Math.floor(10**18*parseFloat(amount)))));//we have to specify amount here, and also above
    console.log(typeof(currentReturn._hex));
    let currentvalue=String(currentReturn._hex);
   return(currentvalue)
@@ -314,7 +314,7 @@ function WithdrawL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
     
 
   return( <div className="row">
-        <input onChange={updateAmount} value={amount} type="text" placeholder="amount3"/>
+        <input onChange={updateAmount} value={amount} type="text" placeholder="amount"/>
         &nbsp;  
         <button
           onClick={() => sendWithdrawL1(amount)}
@@ -337,8 +337,8 @@ async function WithdrawL1Inner(amount) {
   const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
   //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
   
-  
-   let currentReturn =await oldl1l2.withdrawfroml1(amount);//we have to specify amount here, and also above
+  //console.log(typeof(amount));
+   let currentReturn =await oldl1l2.withdrawfroml1(String(BigInt(Math.floor(10**18*parseFloat(amount)))));//we have to specify amount here, and also above
    console.log(typeof(currentReturn._hex));
    let currentvalue=String(currentReturn._hex);
   return(currentvalue)
@@ -400,7 +400,7 @@ function App() {
       </div>
       
       
-      <div className="row" title="Use this to deposit ether directly to L2. Input your L2 account address, and the amount in wei that you want to deposit.">
+      <div className="row" title="Use this to deposit ether directly to L2. Input your L2 account address, and the amount in eth that you want to deposit.">
        
       <DepositL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
@@ -415,7 +415,7 @@ function App() {
       <ReadL1Balance  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
       
-      <div className="row" title="Use this to withdraw form L1, after you have used the previous WithdrawL2 button. You only need to specify the amount in wei, but need to use the account in metamask that you specified in step 2. This is the third and final step of the withdrawal.">
+      <div className="row" title="Use this to withdraw form L1, after you have used the previous WithdrawL2 button. You only need to specify the amount in eth, but need to use the account in metamask that you specified in step 2. This is the third and final step of the withdrawal.">
        
       <WithdrawL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
@@ -432,12 +432,12 @@ function App() {
         <ConnectedOnly>
         </ConnectedOnly>
         
-        <div className="row" title="Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount that you wish to transfer.">
+        <div className="row" title="Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount in eth that you wish to transfer.">
         <Transfer contract={counterContract} />
         
         </div >
         
-        <div className="row" title="Use this to withdraw from L2. This is a three step process, this is the first step. Specify to which L1 account you wish to transfer (make this precise, as your funds will otherwise be lost), and the amount in wei that you wish to transfer.">
+        <div className="row" title="Use this to withdraw from L2. This is a three step process, this is the first step. Specify to which L1 account you wish to transfer (make this precise, as your funds will otherwise be lost), and the amount in eth that you wish to transfer.">
            
         <Withdraw_from_L2 contract={counterContract} />
         </div>
