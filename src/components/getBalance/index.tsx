@@ -33,19 +33,15 @@ export function GetBalance({ contract}: { contract?: Contract}) {
 
   return (
     <div className={styles.counter}>
-      <div className="row">
 
-        Your balance: {val_total/10**18} eth
+        Your Starknet balance: {val_total/10**18} eth
         
-      </div>
-      <div className="row">
       {/*<input onChange={updateAddress} value={addr} type="text" />
         <button
           //onClick={() => ansfer && Transfer({addr, amount_low, amount_high})}
         >
          Get Balance 
   </button>*/}
-      </div>
     </div>
       )}
  

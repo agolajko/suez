@@ -494,7 +494,14 @@ function App() {
   return (
     <div className="container">
 
-      <h1>L1 connection</h1>
+      <div className="row">
+      
+        <ConnectL1WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
+      </div>
+
+      <ConnectedOnly>
+      </ConnectedOnly>      
+      <h1>Deposit to Starknet</h1>
 
       <div className="row">
         Contract Address:{" "}
@@ -502,10 +509,7 @@ function App() {
         
       </div>  
   
-      <div className="row">
-      
-        <ConnectL1WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
-      </div>
+
       
       
       <div className="row" title="Use this to deposit ether directly to L2. Input your L2 account address, and the amount in eth that you want to deposit.">
@@ -518,7 +522,7 @@ function App() {
       
       
      
-      <h1>L2 connection</h1>
+      <h1>Withdraw from Starknet</h1>
       
       <div className="row">
         Contract Address:{" "}
@@ -530,27 +534,24 @@ function App() {
       
       
       
-        <ConnectedOnly>
-        </ConnectedOnly>
+
         
         <div className="row" >
        
       <WithdrawL2  contract={counterContract}/>
       </div>
         
-        <div className="row" title="Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount in eth that you wish to transfer.">
-        <Transfer contract={counterContract} />
-        
-        </div >
-        
-        
-        
-        
+      <h1>Transfer within Starknet</h1>
+
         <div className="row" title="Your L2 balance">
         <GetBalance contract={counterContract} />
-	</div>
-      
-
+	      </div>
+        
+        {/*<div className="row" title="Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount in eth that you wish to transfer.">*/}
+        <Transfer contract={counterContract} />
+        
+        
+        
 
       <div>
 	      <div className="row">

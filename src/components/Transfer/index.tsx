@@ -99,12 +99,10 @@ export function Transfer({ contract}: { contract?: Contract}) {
   try {	
   return (
     <div className={styles.counter}>
-      <div className="row">
        
         
         
         
-      </div>
       <div className="row">
       <input onChange={updateAddress} value={addr} type="text" placeholder="recipient Address"/>
       &nbsp;
