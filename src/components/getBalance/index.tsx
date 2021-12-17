@@ -21,8 +21,12 @@ export function GetBalance({ contract}: { contract?: Contract}) {
 
   //if (val_low_undef == "undefined"){let val_low=0} {let val_low = val_low_undef}; 
   //if (val_high_undef == "undefined"){let val_high=0} {let val_high = val_high_undef};
-  if (val_low && val_high) {let val_total =BigInt(BigInt(val_low)+BigInt(2**128) * BigInt(val_high)) / (BigInt(10**18));
-
+  //console.log(val_low)
+  //console.log(val_high)
+  //console.log(BigInt(val_low)/BigInt(10**9))
+  //console.log(BigInt(BigInt(val_low)+BigInt(2**128) * BigInt(val_high)))
+  if (val_low && val_high) {let val_total =(Big(BigInt(BigInt(val_low)+BigInt(2**128) * BigInt(val_high)).toString()).div(Big(10**18))).toString();
+  console.log(val_total)
 
   return (
     <div className={styles.green}>
