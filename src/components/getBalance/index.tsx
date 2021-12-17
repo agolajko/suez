@@ -4,7 +4,7 @@ import { useStarknetInvoke, useStarknetCall } from "../../lib/hooks";
 import { useStarknet } from "../../providers/StarknetProvider";
 import { useTransaction } from "../../providers/TransactionsProvider";
 import { VoyagerLink } from "../VoyagerLink";
-
+import Big from "big.js";
 import styles from "./index.module.css";  
 
 export function GetBalance({ contract}: { contract?: Contract}) {
@@ -16,32 +16,35 @@ export function GetBalance({ contract}: { contract?: Contract}) {
 
   let val_low = value?.balance?.low
   let val_high = value?.balance?.high
-  let val_total =parseInt(val_low)+2**128 * parseInt(val_high, 16)
-  //const value  = useStarknetCall(contract, "getBalance", account);
+  //let val_total =parseInt(val_low)+2**128 * parseInt(val_high, 16)
+  //let val_total =((Big(BigInt(val_low)).add(Big(2**128).times(Big(BigInt(val_high))))).div(Big(10**18))).toString()
 
-  //const [addr, setAddress] = React.useState("0xadd");
+  //if (val_low_undef == "undefined"){let val_low=0} {let val_low = val_low_undef}; 
+  //if (val_high_undef == "undefined"){let val_high=0} {let val_high = val_high_undef};
+  if (val_low && val_high) {let val_total =BigInt(BigInt(val_low)+BigInt(2**128) * BigInt(val_high)) / (BigInt(10**18));
 
-  {/*const updateAddress = React.useCallback(
-    (evt: React.ChangeEvent<HTMLInputElement>) => {
-      setAddress(evt.target.value);
-    },
-    [setAddress]
-  );*/}
-
-  //console.log(value?.balance?.low)
-  //if (!account) return null;
 
   return (
     <div className={styles.green}>
 
-        Your Starknet balance: {val_total/10**18} eth
+        Your Starknet balance: {val_total} eth
         
-      {/*<input onChange={updateAddress} value={addr} type="text" />
-        <button
-          //onClick={() => ansfer && Transfer({addr, amount_low, amount_high})}
-        >
-         Get Balance 
-  </button>*/}
+
     </div>
-      )}
+      )
+    
+  }
+
+
+ {  return (
+    <div className={styles.green}>
+
+        Your Starknet balance: 0 eth
+        
+
+    </div>
+      ) }
+    
+    
+}
  
