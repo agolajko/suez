@@ -307,13 +307,15 @@ function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
         <button
           onClick={() => sendWithdrawL2(starknetAddress, l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
         >
-        1
+       1. First withdraw from Starknet  
         </button>
-        &nbsp; &nbsp;
+        <br></br>
+        &nbsp; wait 5 minutes to process on Ethereum ⏰ &nbsp;
+        <br></br>
         <button
           onClick={() => sendWithdrawL2toL1(starknetAddress, l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
         >
-        2
+        2. Next move to your wallet
         </button>
         &nbsp;  &nbsp;
         <button
@@ -460,6 +462,7 @@ function App() {
       <ConnectedOnly>
       </ConnectedOnly>      
 
+      <GetBalance contract={counterContract} />
 
      <h1>Deposit to Starknet</h1>
 
@@ -480,8 +483,8 @@ function App() {
       <h1>Withdraw from Starknet</h1>
      <p className = "starknetexplain"> Withdrawal from Starknet back to your Ethereum wallet consists of 3 steps:</p>
      <ol className="starknetexplain">
-        <li> Sending the transaction the the bridge </li>
-        <li> Cross the bridge (consume transaction) </li>
+        <li>  Withdraw your balance from Starknet to the bridge</li>
+        <li> Wait 5 minutes ⏰ to cross the bridge (consume transaction) </li>
         <li> Send the money to your Ethereum wallet from the bridge </li>
      </ol>
         
@@ -492,12 +495,9 @@ function App() {
         
       <h1>Transfer within Starknet</h1>
 
-        <div className="row" title="Your L2 balance">
-        <GetBalance contract={counterContract} />
         
         {/*<div className="row" title="Use this to transfer to other accounts on L2. Input the account that you wish to transfer to, and the amount in eth that you wish to transfer.">*/}
         <Transfer contract={counterContract} />
-	      </div>
         
         
         
