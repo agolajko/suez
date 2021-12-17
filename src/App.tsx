@@ -262,15 +262,16 @@ function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
     async function sendWithdrawL2(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
       function get_amount_low(one_num){
 	      if (one_num == "") {return String(0)}
-	      let new_int = (Big(10**18).times(Big(one_num)).round(0, Big.roundDown);
-	      let am_low = new_int % BigInt((2**128));
+	      let new_int = Big(10**18).times(Big(one_num)).round(0, Big.roundDown);
+	      let am_low = new_int.mod(Big(2**128));
 	      return String(am_low)
   }
 
       function get_amount_high(one_num){
 	    if (one_num == "") {return String(0)}
-	    const new_int = BigInt(Math.floor(10**18*Big(one_num)));
-	    const am_high = String(new_int / BigInt(2**128));
+	    let new_int = Big(10**18).times(Big(one_num)).round(0, Big.roundDown);
+	    //const new_int = BigInt(Math.floor(10**18*Big(one_num)));
+	    const am_high = new_int.div(Big(2**128)).toString();
 	    return am_high
   }
   
@@ -282,18 +283,20 @@ function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
     async function sendWithdrawL2toL1(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
       const provider = new Web3Provider(window.ethereum);
       const signer= provider.getSigner();
-  //console.log( abis.oldl1l2);
       const oldl1l2 = new Contract(ethAddress, abis.oldl1l2, signer);
       
-      let currentReturn =await oldl1l2.withdrawFromL2(l2ContractAddress, l2UserAddress, String(BigInt(Math.floor(10**18*Big(amount)))));
+      const accurate_amount = (Big(10**18).times(Big(amount))).round(0, Big.roundDown).toString();
+      //let currentReturn =await oldl1l2.withdrawFromL2(l2ContractAddress, l2UserAddress, String(BigInt(Math.floor(10**18*Big(amount)))));
+      let currentReturn =await oldl1l2.withdrawFromL2(l2ContractAddress, l2UserAddress, accurate_amount );
     };
     
     async function sendWithdrawL1(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
       const provider = new Web3Provider(window.ethereum);
       const signer= provider.getSigner();
-  //console.log( abis.oldl1l2);
       const oldl1l2 = new Contract(ethAddress, abis.oldl1l2, signer);
-      let currentReturn =await oldl1l2.withdrawFromL1(String(BigInt(Math.floor(10**18*Big(amount)))));
+      //let currentReturn =await oldl1l2.withdrawFromL1(String(BigInt(Math.floor(10**18*Big(amount)))));
+      const accurate_amount = (Big(10**18).times(Big(amount))).round(0, Big.roundDown).toString();
+      let currentReturn =await oldl1l2.withdrawFromL1(accurate_amount);
     }; 
     /////////////////////////////////////////////
     
@@ -384,7 +387,8 @@ async function WithdrawL1Inner(amount) {
   //console.log(typeof(amount));
   
    
-   let currentReturn =await oldl1l2.withdrawFromL1(String(BigInt(Math.floor(10**18*Big(amount)))));//we have to specify amount here, and also above
+   const accurate_amount = (Big(10**18).times(Big(amount))).round(0, Big.roundDown).toString();
+   let currentReturn =await oldl1l2.withdrawFromL1(accurate_amount);//we have to specify amount here, and also above
    //console.log(typeof(currentReturn._hex));
    let currentvalue=String(currentReturn._hex);
   return(currentvalue)
