@@ -31,9 +31,11 @@ import { Body, Button, Header, Image, Link } from "./components";
 import useWeb3Modal from "./hooks/useWeb3Modal";
 import  abis  from "./lib/abi/abis.js";
 import styles from "./components/ConnectedOnly/index.module.css";
+import Big from 'big.js';
 
 declare let window: any;
-
+const ethAddress="0x15b01475bb3070912216dc393c3a782cc90fa1f7";
+const starknetAddress="0x035572dec96ab362c35139675abc4f1c9d6b15ee29c98fbf3f0390a0f8500afa";
 
 
 function ConnectL1WalletButton({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
@@ -129,7 +131,7 @@ async function ReadL1BalanceInner(address) {
   const provider = new Web3Provider(window.ethereum);
   const signer= provider.getSigner();
   //console.log( abis.oldl1l2);
-  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+  const oldl1l2 = new Contract(ethAddress, abis.oldl1l2, signer);
   //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
    let currentReturn =await oldl1l2.accountBalances(address);
   // console.log(typeof(currentReturn._hex));
@@ -184,7 +186,7 @@ function DepositL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
           <input onChange={updateDepositAmount} value={depositAmount} type="text" placeholder="amount"/>
           &nbsp;
         <button
-          onClick={() => sendDeposit("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, depositAmount)}
+          onClick={() => sendDeposit(starknetAddress, l2UserAddress, depositAmount)}
         >
          Deposit L1 
         </button>
@@ -198,13 +200,13 @@ async function depositInner(l2ContractAddress, l2UserAddress, depositAmount) {
   const provider = new Web3Provider(window.ethereum);
   const signer= provider.getSigner();
   //console.log( abis.oldl1l2);
-  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+  const oldl1l2 = new Contract(ethAddress, abis.oldl1l2, signer);
   //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
   let overrides = {
 
     
     // The amount to send with the transaction (i.e. msg.value)
-    value: String(BigInt(Math.floor(10**18*parseFloat(depositAmount)))),//utils.parseEther(depositAmount),
+    value: String(BigInt(Math.floor(10**18*Big(depositAmount)))),//utils.parseEther(depositAmount),
   };
   
    let currentReturn =await oldl1l2.deposit(l2ContractAddress, l2UserAddress, overrides);//we have to specify amount here, and also above
@@ -259,14 +261,14 @@ function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
     async function sendWithdrawL2(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
       function get_amount_low(one_num){
 	      if (one_num == "") {return String(0)}
-	      let new_int = BigInt(Math.floor(10**9*parseFloat(one_num)))*BigInt(10**9);
+	      let new_int = BigInt(Math.floor(10**18*Big(one_num)));
 	      let am_low = new_int % BigInt((2**128));
 	      return String(am_low)
   }
 
       function get_amount_high(one_num){
 	    if (one_num == "") {return String(0)}
-	    const new_int = BigInt(Math.floor(10**18*parseFloat(one_num)));
+	    const new_int = BigInt(Math.floor(10**18*Big(one_num)));
 	    const am_high = String(new_int / BigInt(2**128));
 	    return am_high
   }
@@ -280,63 +282,19 @@ function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
       const provider = new Web3Provider(window.ethereum);
       const signer= provider.getSigner();
   //console.log( abis.oldl1l2);
-      const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+      const oldl1l2 = new Contract(ethAddress, abis.oldl1l2, signer);
       
-      let currentReturn =await oldl1l2.withdrawfroml2(l2ContractAddress, l2UserAddress, l1UserAddress, String(BigInt(Math.floor(10**18*parseFloat(amount)))));
+      let currentReturn =await oldl1l2.withdrawFromL2(l2ContractAddress, l2UserAddress, String(BigInt(Math.floor(10**18*Big(amount)))));
     };
     
     async function sendWithdrawL1(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
       const provider = new Web3Provider(window.ethereum);
       const signer= provider.getSigner();
   //console.log( abis.oldl1l2);
-      const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
-      let currentReturn =await oldl1l2.withdrawfroml1(String(BigInt(Math.floor(10**18*parseFloat(amount)))));
+      const oldl1l2 = new Contract(ethAddress, abis.oldl1l2, signer);
+      let currentReturn =await oldl1l2.withdrawFromL1(String(BigInt(Math.floor(10**18*Big(amount)))));
     }; 
     /////////////////////////////////////////////
-    async function WithdrawL2Inner(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
-  
-  const provider = new Web3Provider(window.ethereum);
-  const signer= provider.getSigner();
-  //console.log( abis.oldl1l2);
-  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
-  //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
-  ////////////////////////////////////////////
-  //Starknet L2 Withdraw
-  //const counterContract = useCounterContract();
-  
-  
-  //console.log("hello")
-  
-  //const transactionStatus = useTransaction(hash);
-  
-  function get_amount_low(one_num){
-    if (one_num == "") {return String(0)}
-    let new_int = BigInt(Math.floor(10**18*parseFloat(one_num)));
-    let am_low = new_int % BigInt((2**128));
-    return String(am_low)
-  }
-
-  function get_amount_high(one_num){
-    if (one_num == "") {return String(0)}
-    const new_int = BigInt(Math.floor(10**18*parseFloat(one_num)));
-    const am_high = String(new_int / BigInt(2**128));
-    return am_high
-  }
-  
-  let amount_low=get_amount_low(amount);
-  let amount_high=get_amount_high(amount);
-  if (withdraw) {withdraw({l1UserAddress, amount_low, amount_high})}
-  /////////////////////////////////////////////////////////////
-  //Consume message widthraw
-  let currentReturn =await oldl1l2.withdrawfroml2(l2ContractAddress, l2UserAddress, l1UserAddress, String(BigInt(Math.floor(10**18*parseFloat(amount)))));//we have to specify amount here, and also above
-  ////////////////////////////////////////////////////////////
-   //withdraw to l1
-  let currentReturn2 =await oldl1l2.withdrawfroml1(String(BigInt(Math.floor(10**18*parseFloat(amount)))));//we have to specify amount here, and also above
-   
-  // console.log(typeof(currentReturn._hex));
-   let currentvalue=String(currentReturn._hex);
-  return(currentReturn)
-}
     
   return( <div className="row">
         {/*<input onChange={updateL2ContractAddress} value={l2ContractAddress} type="text" />*/}
@@ -347,19 +305,19 @@ function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
         <input onChange={updateAmount} value={amount} type="text" placeholder="amount"/>
         <br></br>
         <button
-          onClick={() => sendWithdrawL2("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
+          onClick={() => sendWithdrawL2(starknetAddress, l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
         >
         1
         </button>
-        &nbsp; wait 5 mins &nbsp;
+        &nbsp; &nbsp;
         <button
-          onClick={() => sendWithdrawL2toL1("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
+          onClick={() => sendWithdrawL2toL1(starknetAddress, l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
         >
         2
         </button>
-        &nbsp; wait 5 mins &nbsp;
+        &nbsp;  &nbsp;
         <button
-          onClick={() => sendWithdrawL1("0x05acd15ee8481d8ff545e018f6ceef9d878a4aa9362eaaeaf676b11888248067", l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
+          onClick={() => sendWithdrawL1(starknetAddress, l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
         >
          3 
         </button>
@@ -417,13 +375,13 @@ async function WithdrawL1Inner(amount) {
   const provider = new Web3Provider(window.ethereum);
   const signer= provider.getSigner();
   //console.log( abis.oldl1l2);
-  const oldl1l2 = new Contract("0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997", abis.oldl1l2, signer);
+  const oldl1l2 = new Contract(ethAddress, abis.oldl1l2, signer);
   //await provider.sendTransaction("0x3fD09c109fb7112068142d821f296Ad51592F4F6", );
   
   //console.log(typeof(amount));
   
    
-   let currentReturn =await oldl1l2.withdrawfroml1(String(BigInt(Math.floor(10**18*parseFloat(amount)))));//we have to specify amount here, and also above
+   let currentReturn =await oldl1l2.withdrawFromL1(String(BigInt(Math.floor(10**18*Big(amount)))));//we have to specify amount here, and also above
    //console.log(typeof(currentReturn._hex));
    let currentvalue=String(currentReturn._hex);
   return(currentvalue)
@@ -567,7 +525,7 @@ function App() {
       <div className="rowgrey">
         {/*<p className="grey">Contract Address:{" "}</p>*/}
         Ethereum Solidity Contract Address:{" "}
-          <VoyagerLink.L1Contract contract={"0x523AACa54054997fb16F7c9C40b86fd7Bb6D8997"} />
+          <VoyagerLink.L1Contract contract={ethAddress} />
         
       </div>  
    

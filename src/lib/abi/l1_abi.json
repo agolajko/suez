@@ -1,1 +1,86 @@
-[{"inputs":[{"internalType":"contract IStarknetCore","name":"starknetCore_","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"accountBalances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"l2ContractAddress","type":"uint256"},{"internalType":"uint256","name":"user","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawfroml1","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"l2ContractAddress","type":"uint256"},{"internalType":"uint256","name":"user","type":"uint256"},{"internalType":"uint256","name":"withdrawAddress","type":"uint256"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawfroml2","outputs":[],"stateMutability":"nonpayable","type":"function"}]
+[
+	{
+		"inputs": [
+			{
+				"internalType": "contract IStarknetCore",
+				"name": "starknetCore_",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "accountBalances",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "l2ContractAddress",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "user",
+				"type": "uint256"
+			}
+		],
+		"name": "deposit",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "withdrawFromL1",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "l2ContractAddress",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "user",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "withdrawFromL2",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]
