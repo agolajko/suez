@@ -262,7 +262,7 @@ function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
     async function sendWithdrawL2(l2ContractAddress, l2UserAddress, l1UserAddress, amount, { contract}: { contract?: StarkwareContract}, {account}, {withdraw}, {hash}) {
       function get_amount_low(one_num){
 	      if (one_num == "") {return String(0)}
-	      let new_int = BigInt(Math.floor(10**18*Big(one_num)));
+	      let new_int = (Big(10**18).times(Big(one_num)).round(0, Big.roundDown);
 	      let am_low = new_int % BigInt((2**128));
 	      return String(am_low)
   }
