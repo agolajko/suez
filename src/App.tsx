@@ -31,7 +31,7 @@ import { Body, Button, Header, Image, Link } from "./components";
 import useWeb3Modal from "./hooks/useWeb3Modal";
 import  abis  from "./lib/abi/abis.js";
 import styles from "./components/ConnectedOnly/index.module.css";
-import Big from 'big.js';
+import Big from "big.js";
 
 declare let window: any;
 const ethAddress="0x15b01475bb3070912216dc393c3a782cc90fa1f7";
@@ -188,7 +188,7 @@ function DepositL1({ provider, loadWeb3Modal, logoutOfWeb3Modal}) {
         <button
           onClick={() => sendDeposit(starknetAddress, l2UserAddress, depositAmount)}
         >
-         Deposit L1 
+         Deposit 
         </button>
         {rendered === "" && ""}
       {rendered !== "" && rendered}
@@ -206,7 +206,8 @@ async function depositInner(l2ContractAddress, l2UserAddress, depositAmount) {
 
     
     // The amount to send with the transaction (i.e. msg.value)
-    value: String(BigInt(Math.floor(10**18*Big(depositAmount)))),//utils.parseEther(depositAmount),
+    //value: String(Big(Math.floor(Big(10**18).times(Big(depositAmount))))),//utils.parseEther(depositAmount),
+    value: (Big(10**18).times(Big(depositAmount))).round(0, Big.roundDown).toString(),//utils.parseEther(depositAmount),
   };
   
    let currentReturn =await oldl1l2.deposit(l2ContractAddress, l2UserAddress, overrides);//we have to specify amount here, and also above
@@ -317,12 +318,12 @@ function WithdrawL2({ contract}: { contract?: StarkwareContract} ) {
         >
         2. Next move to your wallet
         </button>
-        &nbsp;  &nbsp;
+        {/*&nbsp;  &nbsp;
         <button
           onClick={() => sendWithdrawL1(starknetAddress, l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}
         >
          3 
-        </button>
+        </button>*/}
         {rendered === "" && " "}
       {rendered !== "" && rendered}
       </div>);
@@ -483,9 +484,9 @@ function App() {
       <h1>Withdraw from Starknet</h1>
      <p className = "starknetexplain"> Withdrawal from Starknet back to your Ethereum wallet consists of 3 steps:</p>
      <ol className="starknetexplain">
-        <li>  Withdraw your balance from Starknet to the bridge</li>
+        <li>  Press to Withdraw your balance from Starknet to the bridge</li>
         <li> Wait 5 minutes ⏰ to cross the bridge (consume transaction) </li>
-        <li> Send the money to your Ethereum wallet from the bridge </li>
+        <li> Move the money to your Ethereum wallet from the bridge </li>
      </ol>
         
         <div className="row" >
