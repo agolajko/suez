@@ -28,6 +28,7 @@ shell.nix
 
 #firebase
 firebase.json
+.firebase
 
 #misc
 package-lock.json
