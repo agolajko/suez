@@ -99,7 +99,7 @@ export function WithdrawL2({ contract}: { contract?: StarkwareContract}) {
        1. First withdraw from Starknet  
         </button>
         <br></br>
-        &nbsp; wait 5 minutes to process on Ethereum ⏰ &nbsp;
+        &nbsp; Wait 25 minutes ⏰ to cross the bridge  &nbsp;
         <br></br>
         <button
           onClick={() => sendWithdrawL2toL1(starknetAddress, l2UserAddress, l1UserAddress, amount, {contract}, {account}, {withdraw}, {hash})}

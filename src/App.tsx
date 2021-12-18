@@ -72,19 +72,24 @@ function App() {
 
       <GetBalance contract={counterContract} />
 
-     <h1>Deposit to Starknet</h1>
 
+      
+      <h1>Deposit to Starknet</h1>
+      <p> Only works with Goerli. Full Ethereum Mainnet support coming soon.<br></br> Until then any real Eth sent will be lost! </p>
       
       <div className="row" title="Use this to deposit ether directly to L2. Input your L2 account address, and the amount in eth that you want to deposit.">
        
       <DepositL1  provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal}/>
       </div>
-      
+
+      <h1>Transfer within Starknet</h1>
+
+        <Transfer contract={counterContract} />        
       <h1>Withdraw from Starknet</h1>
      <p className = "starknetexplain"> Withdrawal from Starknet back to your Ethereum wallet consists of 3 steps:</p>
      <ol className="starknetexplain">
         <li>  Press to Withdraw your balance from Starknet to the bridge</li>
-        <li> Wait 5 minutes ⏰ to cross the bridge (consume transaction) </li>
+        <li> Wait 25 minutes ⏰ to cross the bridge</li>
         <li> Move the money to your Ethereum wallet from the bridge </li>
      </ol>
         
@@ -93,9 +98,7 @@ function App() {
       <WithdrawL2  contract={counterContract}/>
       </div>
         
-      <h1>Transfer within Starknet</h1>
 
-        <Transfer contract={counterContract} />
 
       <div>
 	      <div className="row">
