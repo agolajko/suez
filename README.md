@@ -12,7 +12,3 @@ The Solidity contract is deployed at [0x15b01475bb3070912216dc393c3a782cc90fa1f7
 
 To read more about how the Ethereum <> Starknet Bridges work head over to [https://www.cairo-lang.org/docs/hello_starknet/l1l2.html](https://www.cairo-lang.org/docs/hello_starknet/l1l2.html)
 
-
-
-
-
