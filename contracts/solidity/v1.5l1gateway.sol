@@ -51,10 +51,10 @@ contract L1L2Example {
         starknetCore = starknetCore_;
     }
 
-    function withdrawFroml2(
+    function withdrawFromL2(
         uint256 l2ContractAddress,
         uint256 user, //this is a uint256 here, but it represents an address. So the javascript will have to do the conversion from address to uint256. This makes the gas fee lower.
-        uint256 withdrawAddress,
+        //uint256 withdrawAddress,
         uint256 amount
     ) external {
         // Construct the withdrawal message's payload.
@@ -66,7 +66,7 @@ contract L1L2Example {
 
         payload[0] = MESSAGE_WITHDRAW;
         payload[1] = user;
-        payload[2] = withdrawAddress;
+        payload[2] = uint256(uint160(address(msg.sender)));
         payload[3] = amountLow;
         payload[4] = amountHigh;
 
@@ -75,10 +75,13 @@ contract L1L2Example {
         starknetCore.consumeMessageFromL2(l2ContractAddress, payload);
 
         // Update the L1 balance.
-        accountBalances[withdrawAddress] += amount;
+        bool r = msg.sender.send(amount);
+        if (!r){
+          accountBalances[uint256(uint160(address(msg.sender)))] += amount;
+        }
     }
 
-    function withdrawFroml1(
+    function withdrawFromL1(
         uint256 amount
     ) external {
         
