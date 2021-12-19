@@ -22,14 +22,12 @@ export function ConnectedOnly({ children }: ConnectedOnlyProps): JSX.Element {
   },[account,setRendered ] )
   //if (!account) {
     return (
-      <div>
         <button
           className={styles.connect}
           onClick={() => connectBrowserWallet()}
         >
       {rendered === "" && "Connect Starknet L2 Wallet"}
       {rendered !== "" && rendered}</button>
-      </div>
     );
   //}
   return <React.Fragment>{children}</React.Fragment>;

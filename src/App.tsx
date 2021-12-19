@@ -65,11 +65,12 @@ function App() {
       <div className="row">
       
         <ConnectL1WalletButton provider={provider} loadWeb3Modal={loadWeb3Modal} logoutOfWeb3Modal={logoutOfWeb3Modal} />
+      &nbsp; <a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn"><img src="/metamaskdownload.png" width="200"/></a>
       </div>
 
       <ConnectedOnly>
       </ConnectedOnly>      
-
+      &nbsp; <a href="https://chrome.google.com/webstore/detail/argent-x-starknet-wallet/dlcobpjiigpikoobohmabehhmhfoodbb"><img src="/argentx-button-download.svg" width="200"/></a>
       <GetBalance contract={counterContract} />
 
 
