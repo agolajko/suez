@@ -53,7 +53,7 @@ contract L1L2Example {
 
     function withdrawFromL2(
         uint256 l2ContractAddress,
-        uint256 user, //this is a uint256 here, but it represents an address. So the javascript will have to do the conversion from address to uint256. This makes the gas fee lower.
+        uint256 user, 
         //uint256 withdrawAddress,
         uint256 amount
     ) external {

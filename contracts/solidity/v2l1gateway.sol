@@ -113,21 +113,20 @@ interface IERC20 {
   Demo contract for L1 <-> L2 interaction between an L2 StarkNet contract and this L1 solidity
   contract.
 */
+
+
 contract L1L2Example {
     // The StarkNet core contract.
     IStarknetCore public starknetCore;
 	//l2 Gateway contract address
 	uint256 public l2GatewayAddress;	
-	//balance of l2erc20contracts, not the users/accounts themselves. 	
-    mapping(uint256=> uint256) public custodyBalances;
-   
-   
-
+    
+    // The selector of the "bridgeFromL2" , to get message from l1_handler.
+    uint256 constant BRIDGE_FROM_L2_SELECTOR =
+        1608925829256686334882985760601214942716272403838759250340789998968531558237;
+        
     uint256 constant MESSAGE_WITHDRAW = 0;
 
-    // The selector of the "deposit" l1_handler.
-    uint256 constant DEPOSIT_SELECTOR =
-        352040181584456735608515580760888541466059565068553383579463728554843487745;
 
     /**
       Initializes the contract state.
@@ -154,228 +153,131 @@ contract L1L2Example {
     );
     
     
-    function deposit(
-        IERC20 l1ContractAddress,
-        uint256 l2ContractAddress,
-        uint256 user,
+    function bridgeToL2(
+        IERC20 l1ERC20Contract,
+        uint256 l2ERC20Address,
+        uint256 l2Owner,
         uint256 amount
-    ) external payable {
+    ) external {
         
     	// optimistic transfer, should revert if no approved or not owner
-        l1ContractAddress.transferFrom(msg.sender, address(this), amount);
+        l1ContractAddress.transferFrom(msg.sender, address(this), amount);    
         
 		uint256 amountLow = amount % 2**128;
 		uint256 amountHigh = amount / 2**128;
         // Construct the deposit message's payload.
-        uint256[] memory payload = new uint256[](3);
-        payload[0] = user;
-        payload[1] = amountLow;
-        payload[2] = amountHigh;
-
-        // Send the message to the StarkNet core contract.
-        starknetCore.sendMessageToL2(l2ContractAddress, DEPOSIT_SELECTOR, payload);
-    }
-    
-    
-    
-    
-    // Bridging to Starknet
-    function bridgeToStarknet(
-        IERC721 _l1TokenContract,
-        uint256 _l2TokenContract,
-        uint256 _tokenId,
-        uint256 _account
-    ) external {
-        uint256[] memory payload = new uint256[](4);
-
-        // optimistic transfer, should revert if no approved or not owner
-        _l1TokenContract.transferFrom(msg.sender, address(this), _tokenId);
-
-        // build deposit message payload
-        payload[0] = _account;
-        payload[1] = addressToUint(address(_l1TokenContract));
-        payload[2] = _l2TokenContract;
-        payload[3] = _tokenId;
-
-        // send message
-        starknetCore.sendMessageToL2(
-            endpointGateway,
-            ENDPOINT_GATEWAY_SELECTOR,
-            payload
-        );
-
-        emit BridgeToStarknet(
-            address(_l1TokenContract),
-            _l2TokenContract,
-            _account,
-            _tokenId
-        );
-    }
-
-
-
-
-
-
-    function withdrawFromL2(
-        uint256 l2ContractAddress,
-        uint256 user, //this is a uint256 here, but it represents an address. So the javascript will have to do the conversion from address to uint256. This makes the gas fee lower.
-        //uint256 withdrawAddress,
-        uint256 amount
-    ) external {
-        // Construct the withdrawal message's payload.
         uint256[] memory payload = new uint256[](5);
-        
-	//do the processing for cairo
-	uint256 amountLow = amount % 2**128;
-	uint256 amountHigh = amount / 2**128;
-
-        payload[0] = MESSAGE_WITHDRAW;
-        payload[1] = user;
-        payload[2] = uint256(uint160(address(msg.sender)));
+        payload[0] = l1ERC20Contract;
+        payload[1] = l2ERC20Address;
+        payload[2] = l2Owner;
         payload[3] = amountLow;
         payload[4] = amountHigh;
+
+        // Send the message to the StarkNet core contract.
+        starknetCore.sendMessageToL2(l2ERC20Address, BRIDGE_FROM_MAINNET_SELECTOR, payload);
+        
+        emit BridgeToStarknet(
+            address(l1ERC20Contract),
+            l2ERC20Address,
+            l2Owner,
+            amount
+        );
+    }
+
+	
+
+    function bridgeFromL2(
+    	IERC20 l1ERC20Contract,
+        uint256 l2ERC20Address,
+        uint256 amount
+    ) external {
+        
+        
+		//do the processing for cairo
+		uint256 amountLow = amount % 2**128;
+		uint256 amountHigh = amount / 2**128;
+
+		// Construct the withdrawal message's payload.
+        uint256[] memory payload = new uint256[](6);
+        payload[0] = MESSAGE_WITHDRAW;
+        payload[1] = uint256(uint160(address(l1ERC20Contract)));
+        payload[2] = l2ERC20Address;
+        payload[3] = uint256(uint160(address(msg.sender)));
+        payload[4] = amountLow;
+        payload[5] = amountHigh;
+
+    
+        // Consume the message from the StarkNet core contract.
+        // This will revert the (Ethereum) transaction if the message does not exist.
+        starknetCore.consumeMessageFromL2(l2GatewayAddress, payload);
+
+        l1ERC20Contract.transfer(msg.sender, _tokenId);
+        
+        emit BridgeFromStarknet(
+            address(l1ERC20Contract),
+            l2ERC20Address,
+            address(msg.sender),
+            amount
+        );
+    }    
+    
+    
+    
+    function bridgeEthToL2(
+        IERC20 l1ERC20Contract,
+        uint256 l2ERC20Address,
+        uint256 l2Owner
+    ) external payable {
+        
+        uint256 amount=msg.value;   
+        
+		uint256 amountLow = amount % 2**128;
+		uint256 amountHigh = amount / 2**128;
+        // Construct the deposit message's payload.
+        uint256[] memory payload = new uint256[](5);
+        payload[0] = 0;
+        payload[1] = l2ERC20Address;
+        payload[2] = l2Owner;
+        payload[3] = amountLow;
+        payload[4] = amountHigh;
+
+        // Send the message to the StarkNet core contract.
+        starknetCore.sendMessageToL2(l2ERC20Address, BRIDGE_FROM_MAINNET_SELECTOR, payload);
+        
+        emit BridgeToStarknet(
+            address(l1ERC20Contract),
+            l2ERC20Address,
+            l2Owner,
+            amount
+        );
+    }
+    
+    function bridgeEthFromL2(
+        uint256 l2ContractAddress, 
+        uint256 amount
+    ) external {
+        
+        
+		//do the processing for cairo
+		uint256 amountLow = amount % 2**128;
+		uint256 amountHigh = amount / 2**128;
+
+        uint256[] memory payload = new uint256[](6);
+        payload[0] = MESSAGE_WITHDRAW;
+        payload[1] = 0;
+        payload[2] = l2ERC20Address;
+        payload[3] = uint256(uint160(address(msg.sender)));
+        payload[4] = amountLow;
+        payload[5] = amountHigh;
 
         // Consume the message from the StarkNet core contract.
         // This will revert the (Ethereum) transaction if the message does not exist.
         starknetCore.consumeMessageFromL2(l2ContractAddress, payload);
 
         // Update the L1 balance.
-        bool r = msg.sender.send(amount);
-        if (!r){
-          accountBalances[uint256(uint160(address(msg.sender)))] += amount;
-        }
-    }
-
-    function withdrawFromL1(
-        uint256 amount
-    ) external {
+        msg.sender.send(amount);
         
-        uint256 uintAddress = uint256(uint160(address(msg.sender)));    
-        require(amount <= accountBalances[uintAddress], "Invalid amount.");
-        
-        // Update the L1 balance.
-        accountBalances[uintAddress] -= amount;
-
-        bool r = msg.sender.send(amount);
-        if (!r){
-          accountBalances[uintAddress] += amount;
-        }
-        //return r;
     }
-
-    
 } 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-
-
-contract Gateway {
-    
-    uint256 constant ENDPOINT_GATEWAY_SELECTOR =
-        1738423374452994793145864788013146788518531877200292826651981332061687045062;
-    
-    uint256 constant BRIDGE_MODE_DEPOSIT = 0;
-    uint256 constant BRIDGE_MODE_WITHDRAW = 1;
-
-    
-
-    // Utils
-    function addressToUint(address value)
-        internal
-        pure
-        returns (uint256 convertedValue)
-    {
-        convertedValue = uint256(uint160(address(value)));
-    }
-
-    
-
-    
-
-    function bridgeFromStarknetAvailable(
-        IERC721 _l1TokenContract,
-        uint256 _l2TokenContract,
-        uint256 _tokenId
-    ) external view returns (bool) {
-        uint256[] memory payload = new uint256[](5);
-
-        // build withdraw message payload
-        payload[0] = BRIDGE_MODE_WITHDRAW;
-        payload[1] = addressToUint(msg.sender);
-        payload[2] = addressToUint(address(_l1TokenContract));
-        payload[3] = _l2TokenContract;
-        payload[4] = _tokenId;
-
-        bytes32 msgHash = keccak256(
-            abi.encodePacked(
-                endpointGateway,
-                addressToUint(address(this)),
-                payload.length,
-                payload
-            )
-        );
-
-        return starknetCore.l2ToL1Messages(msgHash) > 0;
-    }
-
-    function debug_bridgeFromStarknetAvailable(
-        IERC721 _l1TokenContract,
-        uint256 _l2TokenContract,
-        uint256 _tokenId
-    ) external view returns (bytes32) {
-        uint256[] memory payload = new uint256[](5);
-
-        // build withdraw message payload
-        payload[0] = BRIDGE_MODE_WITHDRAW;
-        payload[1] = addressToUint(msg.sender);
-        payload[2] = addressToUint(address(_l1TokenContract));
-        payload[3] = _l2TokenContract;
-        payload[4] = _tokenId;
-
-        bytes32 msgHash = keccak256(
-            abi.encodePacked(
-                endpointGateway,
-                addressToUint(address(this)),
-                payload.length,
-                payload
-            )
-        );
-
-        return msgHash;
-    }
-
-    // Bridging back from Starknet
-    function bridgeFromStarknet(
-        IERC721 _l1TokenContract,
-        uint256 _l2TokenContract,
-        uint256 _tokenId
-    ) external {
-        uint256[] memory payload = new uint256[](5);
-
-        // build withdraw message payload
-        payload[0] = BRIDGE_MODE_WITHDRAW;
-        payload[1] = addressToUint(msg.sender);
-        payload[2] = addressToUint(address(_l1TokenContract));
-        payload[3] = _l2TokenContract;
-        payload[4] = _tokenId;
-
-        // consum withdraw message
-        starknetCore.consumeMessageFromL2(endpointGateway, payload);
-
-        // optimistic transfer, should revert if gateway is not token owner
-        _l1TokenContract.transferFrom(address(this), msg.sender, _tokenId);
-
-        emit BridgeFromStarknet(
-            address(_l1TokenContract),
-            _l2TokenContract,
-            msg.sender,
-            _tokenId
-        );
-    }
-}

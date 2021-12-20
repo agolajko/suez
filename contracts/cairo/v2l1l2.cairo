@@ -13,7 +13,7 @@ from starkware.cairo.common.math import assert_not_zero
 
 const MESSAGE_WITHDRAW = 0
 
-@contract_interface ###Rewrite this to ERC20
+@contract_interface 
 namespace IBridgedERC20:
     func mint(to : felt, amount : Uint256):
     end
@@ -95,7 +95,7 @@ end
 
 # receive and handle deposit messages
 @l1_handler
-func bridgeFromMainnet{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+func bridgeFromL1{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
         from_address : felt,  l1ERC20Address : felt , l2ERC20Address : felt , owner : felt,
        amountLow : felt, amountHigh:felt):
        
@@ -157,7 +157,7 @@ func consumeMintCredit{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_c
     return ()
 end
 
-# revoke all of the available mint credit if consuming is failing. Basically a variant of withdraw. 
+# revoke all of the available mint credit if consuming is failing. Basically a variant of BridgeToL1. 
 @external
 func revokeMintCredit{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
         l1ERC20Address : felt, l2ERC20Address : felt, l1Owner : felt ):
@@ -194,7 +194,7 @@ end
 
 # burns the L2 ERC20 and sends withdrawal message
 @external
-func bridgeToMainnet{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+func bridgeToL1{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
         l2ERC20Address : felt, l1Owner : felt, amount : Uint256):
     alloc_locals
     
