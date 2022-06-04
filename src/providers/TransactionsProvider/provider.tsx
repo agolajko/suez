@@ -37,7 +37,7 @@ export function TransactionsProvider({
 
       const checkTransaction = async (tx: StoredTransaction) => {
         console.log(`checking tx status ${tx.hash}`);
-        if (tx.code === "REJECTED" || tx.code === "ACCEPTED_ONCHAIN") {
+        if (tx.code === "REJECTED" || tx.code === "ACCEPTED_ON_L2") {
           return tx;
         }
 

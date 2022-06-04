@@ -1,7 +1,7 @@
-import { AddTransactionResponse, Status, TxStatus } from "starknet";
+import { AddTransactionResponse, Status } from "starknet";
 
 export interface StoredTransaction {
-  code: TxStatus | Status;
+  code: Status;
   hash: string;
   address?: string;
   lastChecked: string;
